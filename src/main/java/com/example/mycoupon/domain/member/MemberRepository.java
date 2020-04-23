@@ -1,8 +1,8 @@
-package com.example.mycoupon.repository;
+package com.example.mycoupon.domain.member;
 
-import com.example.mycoupon.domain.Member;
+import com.example.mycoupon.domain.member.Member;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface MemberRepository extends JpaRepository<Member, Long> {
-    Member findByMemberId(String memberId);
+    Member findByMediaId(String mediaId);
 }

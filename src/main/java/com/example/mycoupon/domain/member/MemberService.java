@@ -1,14 +1,17 @@
-package com.example.mycoupon.service;
+package com.example.mycoupon.domain.member;
 
-import com.example.mycoupon.domain.Member;
+import com.example.mycoupon.exceptions.IllegalArgumentException;
 import com.example.mycoupon.payload.UserModel;
-import com.example.mycoupon.repository.MemberRepository;
+import lombok.extern.slf4j.Slf4j;
+import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 
+@Slf4j
 @Transactional
 @Service
 public class MemberService {
@@ -26,8 +29,20 @@ public class MemberService {
         // 트랜잭션 레벨 설정
         Member member = new Member(model.getId(), model.getPassword());
         member.setPassword(passwordEncoder.encode(member.getPassword()));
-        memberRepository.save(member);
+        try {
+            memberRepository.save(member);
+        } catch(DataIntegrityViolationException ex) {
+            log.debug(ex.getMessage());
+            if(ex.getCause() instanceof ConstraintViolationException) {
+                throw new IllegalArgumentException("user id already exists.");
+            } else {
+                throw ex;
+            }
+        }
+
     }
 
-
+//    public Optional<Member> findById(long id) {
+//        return memberRepository.findById(id);
+//    }
 }
