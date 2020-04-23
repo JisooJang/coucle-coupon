@@ -2,6 +2,7 @@ package com.example.mycoupon.domain.coupon;
 
 import com.example.mycoupon.domain.couponInfo.CouponInfo;
 import com.example.mycoupon.domain.member.Member;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 
@@ -35,6 +36,7 @@ public class Coupon {
     @Column(name = "expired_at", nullable = false, updatable = false)
     private Date expiredAt;
 
+    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "member_id")
     private Member member; // FK

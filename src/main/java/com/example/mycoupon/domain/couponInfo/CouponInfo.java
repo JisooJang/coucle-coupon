@@ -1,6 +1,7 @@
 package com.example.mycoupon.domain.couponInfo;
 
 import com.example.mycoupon.domain.coupon.Coupon;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 import org.hibernate.annotations.UpdateTimestamp;
 
@@ -19,6 +20,7 @@ public class CouponInfo {
     @Id
     private long couponId;
 
+    @JsonIgnore
     @OneToOne
     @JoinColumn
     @MapsId
