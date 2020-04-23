@@ -8,6 +8,7 @@ import com.example.mycoupon.security.SecurityMember;
 import com.example.mycoupon.domain.member.MemberService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -80,6 +81,6 @@ public class SignUpFilter extends AbstractAuthenticationProcessingFilter {
                 .sign(Algorithm.HMAC512(JWTSecurityConstants.SECRET.getBytes()));
 
         res.addHeader(JWTSecurityConstants.HEADER_STRING, JWTSecurityConstants.TOKEN_PREFIX + token);
-
+        res.setStatus(HttpStatus.CREATED.value());
     }
 }

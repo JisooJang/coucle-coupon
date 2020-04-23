@@ -33,7 +33,6 @@ public class MemberService {
         try {
             memberRepository.save(member);
         } catch(DataIntegrityViolationException ex) {
-            log.debug(ex.getMessage());
             if(ex.getCause() instanceof ConstraintViolationException) {
                 throw new IllegalArgumentException("user id already exists.");
             } else {
