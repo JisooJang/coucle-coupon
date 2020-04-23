@@ -1,6 +1,6 @@
 package com.example.mycoupon.security;
 
-import com.example.mycoupon.domain.Member;
+import com.example.mycoupon.domain.member.Member;
 import lombok.Getter;
 import org.springframework.security.core.userdetails.User;
 
@@ -11,7 +11,7 @@ public class SecurityMember extends User {
     private final long id;
 
     public SecurityMember(Member member) {
-        super(member.getMemberId(), member.getPassword(), Collections.emptyList());
+        super(member.getMediaId(), member.getPassword(), Collections.emptyList());
         this.id = member.getId();
     }
 }
