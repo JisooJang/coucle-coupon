@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -18,10 +19,13 @@ public class CouponService {
 
     private final CouponInfoRepository couponInfoRepository;
 
+    private final Calendar calendar;
+
     @Autowired
-    public CouponService(CouponRepository couponRepository, CouponInfoRepository couponInfoRepository) {
+    public CouponService(CouponRepository couponRepository, CouponInfoRepository couponInfoRepository, Calendar calendar) {
         this.couponRepository = couponRepository;
         this.couponInfoRepository = couponInfoRepository;
+        this.calendar = calendar;
     }
 
     public String getUUIDCouponCode() {
@@ -29,9 +33,11 @@ public class CouponService {
         return UUID.randomUUID().toString();
     }
 
-    public Date getRandomExpiredAt() {
-        // TODO: add random expired hours from now date
-        return new Date();
+    public Date getRandomExpiredAt(Date fromDate) {
+        // add random expired days from now date (1 day ~ 7 days)
+        calendar.setTime(fromDate);
+        calendar.add(Calendar.DATE, (int)(Math.random() * 7) + 1);
+        return calendar.getTime();
     }
 
     // TODO: 트랜잭션 격리 레벨 설정
@@ -44,9 +50,11 @@ public class CouponService {
         // 4. 1~3번을 트랜잭션으로 묶기. (트랜잭션 격리 레벨 설정)
         // 5. 1~4번을 n번 반복하기.
         // TODO: 5번의 경우 서비스 레벨에서 반복하면 안됨. 트랜잭션 묶이는 단위가 한꺼번에 되버림! 멀티쓰레드 코딩 가능한지 찾아보기.
+        Date createdAt = new Date();
         Coupon coupon = Coupon.builder()
                 .code(getUUIDCouponCode())
-                .expiredAt(getRandomExpiredAt())
+                .createdAt(createdAt)
+                .expiredAt(getRandomExpiredAt(createdAt))
                 .build();
 
         Coupon couponResult = couponRepository.save(coupon);
