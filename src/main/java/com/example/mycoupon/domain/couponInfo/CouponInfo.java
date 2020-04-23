@@ -16,10 +16,10 @@ import java.util.Date;
 @Entity
 @Table(name = "coupon_info")
 public class CouponInfo {
-
     @Id
     private long couponId;
 
+    // TODO: 현재 양방향 매핑이 되어 있어 순환참조 문제 우려. CouponInfo에는 매핑 제거할 방법 더 찾아볼 것.
     @JsonIgnore
     @OneToOne
     @JoinColumn

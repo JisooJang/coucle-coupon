@@ -30,7 +30,6 @@ public class Coupon {
     private String code;  // TODO: 랜덤 코드, add index
 
     @Column(name = "created_at", nullable = false, updatable = false)
-    @CreationTimestamp
     private Date createdAt;
 
     @Column(name = "expired_at", nullable = false, updatable = false)
@@ -42,7 +41,6 @@ public class Coupon {
     private Member member; // FK
 
     // TODO : 연관관계의 주인은 Coupon entity
-    // 대상테이블이 CouponInfo entity ( CouponInfo에는 Coupon entity 정보를 가지고 있을 필요가 없음)
     @OneToOne(mappedBy = "coupon")
-    private CouponInfo couponInfo; // 1:1
+    private CouponInfo couponInfo;
 }
