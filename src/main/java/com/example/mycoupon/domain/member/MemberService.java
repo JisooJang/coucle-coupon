@@ -25,13 +25,13 @@ public class MemberService {
         this.passwordEncoder = passwordEncoder;
     }
 
-    public void signUp(UserModel model) {
+    public Member signUp(UserModel model) {
         // password 암호화 저장
         // 트랜잭션 레벨 설정
         Member member = new Member(model.getId(), model.getPassword());
         member.setPassword(passwordEncoder.encode(member.getPassword()));
         try {
-            memberRepository.save(member);
+            return memberRepository.save(member);
         } catch(DataIntegrityViolationException ex) {
             if(ex.getCause() instanceof ConstraintViolationException) {
                 throw new IllegalArgumentException("user id already exists.");

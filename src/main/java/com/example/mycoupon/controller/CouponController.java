@@ -39,7 +39,7 @@ public class CouponController {
         if(num >= 100) {
             return ResponseEntity.badRequest().build();
         }
-        couponservice.save(num);
+        couponservice.bulkSave(num);
 
         URI selfLink = URI.create(
                 ServletUriComponentsBuilder.fromCurrentRequest().toUriString()
@@ -70,15 +70,17 @@ public class CouponController {
 
     // 4. 지급된 쿠폰 중 하나를 사용하는 API를 구현하세요. (쿠폰 재사용은 불가)
     @PutMapping("/{coupon_code}")
-    public ResponseEntity<?> useCoupon(@PathVariable("coupon_code") String couponCode) throws CouponNotFoundException {
-        couponservice.updateIsEnabledCouponById(couponCode, false);
+    public ResponseEntity<?> useCoupon(@PathVariable("coupon_code") String couponCode,
+                                       @RequestAttribute("memberId") long memberId) throws CouponNotFoundException {
+        couponservice.updateIsEnabledCouponById(couponCode, memberId, false);
         return ResponseEntity.ok().build();
     }
 
     // 5. 지급된 쿠폰 중 하나를 사용 취소하는 API를 구현하세요. (취소된 쿠폰 재사용 가능)
     @PutMapping("/{coupon_code}/cancel")
-    public ResponseEntity<?> cancelUseCoupon(@PathVariable("coupon_code") String couponCode) throws CouponNotFoundException {
-        couponservice.updateIsEnabledCouponById(couponCode, true);
+    public ResponseEntity<?> cancelUseCoupon(@PathVariable("coupon_code") String couponCode,
+                                             @RequestAttribute("memberId") long memberId) throws CouponNotFoundException {
+        couponservice.updateIsEnabledCouponById(couponCode, memberId,true);
         return ResponseEntity.ok().build();
     }
 
