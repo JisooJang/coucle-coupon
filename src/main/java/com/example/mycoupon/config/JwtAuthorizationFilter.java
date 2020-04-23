@@ -54,6 +54,7 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
                         .getAudience().get(0);
 
             if(user != null) {
+                // 인증이 완료된 토큰 return
                 return new UsernamePasswordAuthenticationToken(user, null, new ArrayList<>());
             }
             return null;
