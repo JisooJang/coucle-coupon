@@ -1,6 +1,7 @@
 package com.example.mycoupon.domain.coupon;
 
 import com.example.mycoupon.domain.couponInfo.CouponInfo;
+import com.example.mycoupon.domain.member.Member;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 
@@ -34,9 +35,9 @@ public class Coupon {
     @Column(name = "expired_at", nullable = false, updatable = false)
     private Date expiredAt;
 
-    @Column(name = "member_id", nullable = false)   // 1:1
-    private long memberId; // FK
-
+    @ManyToOne
+    @JoinColumn(name = "member_id")
+    private Member member; // FK
 
     // TODO : 연관관계의 주인은 Coupon entity
     // 대상테이블이 CouponInfo entity ( CouponInfo에는 Coupon entity 정보를 가지고 있을 필요가 없음)
