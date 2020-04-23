@@ -59,7 +59,7 @@ public class CouponController {
     }
 
     // 3. 사용자에게 지급된 쿠폰을 조회하는 API를 구현하세요.
-    @GetMapping("/users")
+    @GetMapping("/user")
     public ResponseEntity<List<Coupon>> getUsersCoupons(@RequestAttribute("memberId") long memberId) throws MemberNotFoundException {
         List<Coupon> coupons = couponservice.findByMember(memberId);
         if(coupons == null || coupons.size() == 0) {
