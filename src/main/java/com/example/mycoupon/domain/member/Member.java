@@ -38,9 +38,9 @@ public class Member {
     private Date createdAt;
 
 // 회원은 쿠폰을 갖고 있을 수도 있고, 안갖고 있을 수도 있다.
-    @OneToMany // LAZY init
-    @JoinColumn(name = "member_id") // Coupon 테이블의 member_id (FK)
-    private List<Coupon> coupons;
+//    @OneToMany // LAZY init
+//    @JoinColumn(name = "member_id", nullable = true) // Coupon 테이블의 member_id (FK)
+//    private List<Coupon> coupons;
 
     @Builder
     public Member(String mediaId, String password) {
