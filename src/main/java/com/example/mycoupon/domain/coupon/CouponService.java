@@ -44,17 +44,18 @@ public class CouponService {
 
     public void bulkSave(int n) {
         // TODO: save() n번 반복? 멀티 쓰레딩?
-        save();
+        save(null);
     }
 
     // TODO: 트랜잭션 격리 레벨 설정
     @Transactional
-    public Coupon save() {
+    public Coupon save(Member member) {
         Date createdAt = new Date();
         Coupon coupon = Coupon.builder()
                 .code(getUUIDCouponCode())
                 .createdAt(createdAt)
                 .expiredAt(getRandomExpiredAt(createdAt))
+                .member(member)
                 .build();
 
         Coupon couponResult = couponRepository.save(coupon);
@@ -69,9 +70,10 @@ public class CouponService {
         // TODO: 트랜잭션 레벨 고려 (쿠폰을 멤버에 할당하는 도중, 다른 트랜잭션에서 이 쿠폰에 접근하거나 유저를 할당하면 안됨.)
         Coupon coupon = couponRepository.findByFreeUser();
         if(coupon == null) {
-            coupon = save();
+            coupon = save(member);
+        } else {
+            coupon.setMember(member);  // update SQL
         }
-        coupon.setMember(member);  // update SQL
         return coupon.getCode();
     }
 
