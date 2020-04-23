@@ -35,8 +35,11 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
         }
 
         UsernamePasswordAuthenticationToken authentication = getAuthentication(req);
-
         SecurityContextHolder.getContext().setAuthentication(authentication);
+
+        if(authentication != null) {
+            req.setAttribute("memberId", Long.parseLong((String)authentication.getPrincipal()));
+        }
         chain.doFilter(req, res);
     }
 
@@ -47,7 +50,8 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
                 String user = JWT.require(Algorithm.HMAC512(JWTSecurityConstants.SECRET.getBytes()))
                         .build()
                         .verify(token.replace(JWTSecurityConstants.TOKEN_PREFIX, ""))
-                        .getSubject();
+                        //.getSubject();
+                        .getAudience().get(0);
 
             if(user != null) {
                 return new UsernamePasswordAuthenticationToken(user, null, new ArrayList<>());

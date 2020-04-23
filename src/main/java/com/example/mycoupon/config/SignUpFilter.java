@@ -5,14 +5,13 @@ import com.auth0.jwt.algorithms.Algorithm;
 import com.example.mycoupon.payload.UserModel;
 import com.example.mycoupon.security.JWTSecurityConstants;
 import com.example.mycoupon.security.SecurityMember;
-import com.example.mycoupon.service.MemberService;
+import com.example.mycoupon.domain.member.MemberService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
