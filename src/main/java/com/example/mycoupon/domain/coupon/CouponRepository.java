@@ -13,7 +13,7 @@ public interface CouponRepository extends JpaRepository<Coupon, Long> {
     //@Query(value = "UPDATE coupon SET user_id = ?1 WHERE id = (SELECT id from coupon WHERE user_id IS NULL LIMIT 1)", nativeQuery = true)
     public Coupon findByFreeUser();
 
-    @Query(value = "SELECT * from coupon WHERE DATE(expiredAt) = DATE(NOW())", nativeQuery = true)
+    @Query(value = "SELECT * from coupon WHERE FORMATDATETIME(EXPIRED_AT, 'yyyy-MM-dd') = CURRENT_DATE()", nativeQuery = true)
     public List<Coupon> findByExpiredToday();
 
     public Coupon findByCode(String code);
