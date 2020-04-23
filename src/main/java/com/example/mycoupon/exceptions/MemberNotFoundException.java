@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 public class MemberNotFoundException extends RuntimeException {
     private long memberId;
 
-    public MemberNotFoundException(String memberId) {
+    public MemberNotFoundException(long memberId) {
         super("Member not found : " +memberId);
     }
 }
