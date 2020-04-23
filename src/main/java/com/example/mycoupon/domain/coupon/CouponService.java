@@ -1,21 +1,15 @@
 package com.example.mycoupon.domain.coupon;
 
-import com.example.mycoupon.domain.coupon.Coupon;
 import com.example.mycoupon.domain.couponInfo.CouponInfo;
 import com.example.mycoupon.domain.member.Member;
-import com.example.mycoupon.domain.member.MemberService;
 import com.example.mycoupon.exceptions.CouponNotFoundException;
 import com.example.mycoupon.domain.couponInfo.CouponInfoRepository;
-import com.example.mycoupon.domain.coupon.CouponRepository;
-import com.example.mycoupon.exceptions.MemberNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.swing.text.html.Option;
 import javax.transaction.Transactional;
 import java.util.Date;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -47,7 +41,7 @@ public class CouponService {
         // 1. create Coupon instance -> save
         // 2. create CouponInfo instance -> set coupon_id to 1 instance's id.
         // 3. save CouponInfo instance
-        // 4. 1~3번을 트랜잭션으로 묶기. (트랜잭션 격리레벨 설정)
+        // 4. 1~3번을 트랜잭션으로 묶기. (트랜잭션 격리 레벨 설정)
         // 5. 1~4번을 n번 반복하기.
         // TODO: 5번의 경우 서비스 레벨에서 반복하면 안됨. 트랜잭션 묶이는 단위가 한꺼번에 되버림! 멀티쓰레드 코딩 가능한지 찾아보기.
         Coupon coupon = Coupon.builder()
