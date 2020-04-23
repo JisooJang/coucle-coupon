@@ -44,7 +44,9 @@ public class CouponService {
 
     public void bulkSave(int n) {
         // TODO: save() n번 반복? 멀티 쓰레딩?
-        save(null);
+        for(int i=0 ; i<n ; i++) {
+            save(null);
+        }
     }
 
     // TODO: 트랜잭션 격리 레벨 설정
