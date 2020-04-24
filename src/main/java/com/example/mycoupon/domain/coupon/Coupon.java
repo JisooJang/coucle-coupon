@@ -1,11 +1,14 @@
 package com.example.mycoupon.domain.coupon;
 
+import com.example.mycoupon.common.ValidationRegex;
 import com.example.mycoupon.domain.couponInfo.CouponInfo;
 import com.example.mycoupon.domain.member.Member;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
 
 import javax.persistence.*;
+import javax.validation.constraints.Pattern;
 import java.util.Date;
 
 @Getter
@@ -25,10 +28,12 @@ public class Coupon {
     @Column(name = "id")
     private long id;
 
+    @Pattern(regexp = ValidationRegex.COUPONCODE)
     @Column(name = "code", nullable = false, unique = true, updatable = false)
     private String code;  // TODO: 랜덤 코드, add index
 
     @Column(name = "created_at", nullable = false, updatable = false)
+    @CreationTimestamp
     private Date createdAt;
 
     @Column(name = "expired_at")
