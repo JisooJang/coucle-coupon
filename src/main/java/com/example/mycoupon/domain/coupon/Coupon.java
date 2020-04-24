@@ -32,8 +32,11 @@ public class Coupon {
     @Column(name = "created_at", nullable = false, updatable = false)
     private Date createdAt;
 
-    @Column(name = "expired_at", nullable = false, updatable = false)
+    @Column(name = "expired_at", updatable = false)
     private Date expiredAt;
+
+    @Column(name = "assigned_at", updatable = false)
+    private Date assignedAt;
 
     @JsonIgnore
     @ManyToOne

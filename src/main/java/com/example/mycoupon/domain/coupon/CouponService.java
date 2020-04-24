@@ -5,6 +5,7 @@ import com.example.mycoupon.domain.member.Member;
 import com.example.mycoupon.exceptions.CouponMemberNotMatchException;
 import com.example.mycoupon.exceptions.CouponNotFoundException;
 import com.example.mycoupon.domain.couponInfo.CouponInfoRepository;
+import com.example.mycoupon.exceptions.IllegalArgumentException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -27,6 +28,10 @@ public class CouponService {
         this.couponRepository = couponRepository;
         this.couponInfoRepository = couponInfoRepository;
         this.calendar = calendar;
+    }
+
+    public void validateCouponCode(String code) throws IllegalArgumentException {
+        // TODO: code가 UUID 형식이 아니면 raise error.
     }
 
     public String getUUIDCouponCode() {
@@ -52,16 +57,25 @@ public class CouponService {
     // TODO: 트랜잭션 격리 레벨 설정
     @Transactional
     public Coupon save(Member member) {
-        Date createdAt = new Date();
-        Coupon coupon = Coupon.builder()
-                .code(getUUIDCouponCode())
-                .createdAt(createdAt)
-                .expiredAt(getRandomExpiredAt(createdAt))
-                .member(member)
-                .build();
+        Coupon coupon;
+        Date nowDate = new Date();
+        if(member == null) {
+            coupon = Coupon.builder()
+                    .code(getUUIDCouponCode())
+                    .createdAt(nowDate)
+                    .build();
+        } else {
+            coupon = Coupon.builder()
+                    .code(getUUIDCouponCode())
+                    .createdAt(nowDate)
+                    .assignedAt(nowDate)
+                    .expiredAt(getRandomExpiredAt(nowDate))
+                    .member(member)
+                    .build();
+        }
 
         Coupon couponResult = couponRepository.save(coupon);
-        CouponInfo couponInfo = CouponInfo.builder().coupon(couponResult).isEnabled(true).build();
+        CouponInfo couponInfo = CouponInfo.builder().coupon(couponResult).isUsed(false).build();
         couponInfoRepository.save(couponInfo);
 
         return couponResult;
@@ -74,13 +88,16 @@ public class CouponService {
         if(coupon == null) {
             coupon = save(member);
         } else {
+            Date assignedAt = new Date();
             coupon.setMember(member);  // update SQL
+            coupon.setAssignedAt(assignedAt);
+            coupon.setExpiredAt(getRandomExpiredAt(assignedAt));
         }
         return coupon.getCode();
     }
 
     @Transactional
-    public void updateIsEnabledCouponById(String code, long memberId, boolean isEnabled) throws CouponNotFoundException {
+    public void updateIsEnabledCouponById(String code, long memberId, boolean isUsed) throws CouponNotFoundException {
         // TODO : transaction 레벨 설정
         //couponInfoRepository.updateByCode(code, isEnabled);
         Coupon coupon = couponRepository.findByCode(code);
@@ -90,7 +107,7 @@ public class CouponService {
         if(coupon.getMember().getId() != memberId) {
             throw new CouponMemberNotMatchException(code);
         }
-        coupon.getCouponInfo().setEnabled(isEnabled);
+        coupon.getCouponInfo().setUsed(isUsed);
     }
 
     public List<Coupon> findExpiredToday() {

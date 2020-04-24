@@ -26,8 +26,9 @@ public class CouponInfo {
     @MapsId
     private Coupon coupon;
 
-    @Column(name = "is_enabled", nullable = false)
-    private boolean isEnabled;  // 자주 값이 변경될 수 있는 컬럼이라 테이블을 분리함.
+    @Column(name = "is_used", nullable = false)
+    private boolean isUsed;  // 자주 값이 변경될 수 있는 컬럼이라 테이블을 분리함.
+
 
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "last_updated_time")
