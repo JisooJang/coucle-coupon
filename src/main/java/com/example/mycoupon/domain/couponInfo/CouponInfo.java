@@ -19,16 +19,15 @@ public class CouponInfo {
     @Id
     private long couponId;
 
-    // TODO: 현재 양방향 매핑이 되어 있어 순환참조 문제 우려. CouponInfo에는 매핑 제거할 방법 더 찾아볼 것.
+    // TODO: 현재 양방향 매핑이 되어 있어 순환 참조 문제 우려
     @JsonIgnore
     @OneToOne
-    @JoinColumn
+    @JoinColumn(nullable = false)
     @MapsId
     private Coupon coupon;
 
     @Column(name = "is_used", nullable = false)
     private boolean isUsed;  // 자주 값이 변경될 수 있는 컬럼이라 테이블을 분리함.
-
 
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "last_updated_time")

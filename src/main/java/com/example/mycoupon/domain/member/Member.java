@@ -1,7 +1,6 @@
 package com.example.mycoupon.domain.member;
 
 import com.example.mycoupon.common.ValidationRegex;
-import com.example.mycoupon.domain.coupon.Coupon;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 
@@ -9,7 +8,6 @@ import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
 import java.util.Date;
-import java.util.List;
 
 @Getter
 @Setter
@@ -36,11 +34,6 @@ public class Member {
     @Column(name = "created_at", nullable = false, updatable = false)
     @CreationTimestamp
     private Date createdAt;
-
-// 회원은 쿠폰을 갖고 있을 수도 있고, 안갖고 있을 수도 있다.
-//    @OneToMany // LAZY init
-//    @JoinColumn(name = "member_id", nullable = true) // Coupon 테이블의 member_id (FK)
-//    private List<Coupon> coupons;
 
     @Builder
     public Member(String mediaId, String password) {
