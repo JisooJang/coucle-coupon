@@ -15,6 +15,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -65,6 +66,7 @@ public class CouponRepositoryTest {
 
         this.entityManager.flush();  // UPDATE DB 반영
     }
+
     @Test
     public void findByFreeUsers() throws Exception {
         Coupon freeCoupon = couponRepository.findByFreeUser();
@@ -96,5 +98,16 @@ public class CouponRepositoryTest {
         assertThat(results).size().isEqualTo(1);
         assertThat(results.get(0).getMember()).isNotNull();
         assertThat(results.get(0).getAssignedAt()).isNotNull();
+    }
+
+    @Test
+    public void save() throws Exception {
+        Coupon coupon = Coupon.builder()
+                .code(UUID.randomUUID().toString())
+                .createdAt(new Date())
+                .build();
+        Coupon result = couponRepository.save(coupon);
+
+        assertThat(result).isEqualTo(coupon);
     }
 }
