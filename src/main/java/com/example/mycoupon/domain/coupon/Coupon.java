@@ -4,7 +4,6 @@ import com.example.mycoupon.domain.couponInfo.CouponInfo;
 import com.example.mycoupon.domain.member.Member;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
-import org.hibernate.annotations.CreationTimestamp;
 
 import javax.persistence.*;
 import java.util.Date;
@@ -32,10 +31,10 @@ public class Coupon {
     @Column(name = "created_at", nullable = false, updatable = false)
     private Date createdAt;
 
-    @Column(name = "expired_at", updatable = false)
+    @Column(name = "expired_at")
     private Date expiredAt;
 
-    @Column(name = "assigned_at", updatable = false)
+    @Column(name = "assigned_at")
     private Date assignedAt;
 
     @JsonIgnore
