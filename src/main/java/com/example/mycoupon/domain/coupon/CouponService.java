@@ -1,5 +1,6 @@
 package com.example.mycoupon.domain.coupon;
 
+import com.example.mycoupon.common.ValidationRegex;
 import com.example.mycoupon.domain.couponInfo.CouponInfo;
 import com.example.mycoupon.domain.member.Member;
 import com.example.mycoupon.exceptions.CouponMemberNotMatchException;
@@ -14,6 +15,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
+import java.util.regex.Pattern;
 
 @Service
 public class CouponService {
@@ -23,15 +25,20 @@ public class CouponService {
 
     private final Calendar calendar;
 
+    //private final EntityManager entityManager;
+
     @Autowired
-    public CouponService(CouponRepository couponRepository, CouponInfoRepository couponInfoRepository, Calendar calendar) {
+    public CouponService(CouponRepository couponRepository, CouponInfoRepository couponInfoRepository,
+                         Calendar calendar) {
         this.couponRepository = couponRepository;
         this.couponInfoRepository = couponInfoRepository;
         this.calendar = calendar;
     }
 
     public void validateCouponCode(String code) throws IllegalArgumentException {
-        // TODO: code가 UUID 형식이 아니면 raise error.
+        if(!Pattern.matches(ValidationRegex.COUPONCODE, code)) {
+            throw new IllegalArgumentException("Invalid format of coupon code.");
+        }
     }
 
     public String getUUIDCouponCode() {
@@ -45,7 +52,6 @@ public class CouponService {
         calendar.add(Calendar.DATE, (int)(Math.random() * 7) + 1);
         return calendar.getTime();
     }
-
 
     public void bulkSave(int n) {
         // TODO: save() n번 반복? 멀티 쓰레딩?
@@ -62,12 +68,10 @@ public class CouponService {
         if(member == null) {
             coupon = Coupon.builder()
                     .code(getUUIDCouponCode())
-                    .createdAt(nowDate)
                     .build();
         } else {
             coupon = Coupon.builder()
                     .code(getUUIDCouponCode())
-                    .createdAt(nowDate)
                     .assignedAt(nowDate)
                     .expiredAt(getRandomExpiredAt(nowDate))
                     .member(member)
@@ -92,6 +96,7 @@ public class CouponService {
             coupon.setMember(member);  // update SQL
             coupon.setAssignedAt(assignedAt);
             coupon.setExpiredAt(getRandomExpiredAt(assignedAt));
+            //TODO: assignedAt, expiredAt 변경 감지가 적용 안됨. member는 변경 감지 적용하여 update 쿼리 실행
         }
         return coupon.getCode();
     }
@@ -99,7 +104,6 @@ public class CouponService {
     @Transactional
     public void updateIsEnabledCouponById(String code, long memberId, boolean isUsed) throws CouponNotFoundException {
         // TODO : transaction 레벨 설정
-        //couponInfoRepository.updateByCode(code, isEnabled);
         Coupon coupon = couponRepository.findByCode(code);
         if(coupon == null) {
             throw new CouponNotFoundException(code);
