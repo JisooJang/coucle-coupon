@@ -4,9 +4,12 @@ import com.example.mycoupon.domain.member.MemberRepository;
 import com.example.mycoupon.domain.member.MemberService;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.test.context.junit4.SpringRunner;
 
+@RunWith(SpringRunner.class)
 public class MemberServiceTest {
     @MockBean
     private MemberRepository memberRepository;

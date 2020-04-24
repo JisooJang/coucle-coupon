@@ -27,7 +27,6 @@ public class CouponInfoRepositoryTest {
     @Test
     public void save() {
         Coupon coupon = Coupon.builder()
-                .createdAt(new Date())
                 .code(UUID.randomUUID().toString())
                 .build();
 

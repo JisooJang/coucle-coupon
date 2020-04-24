@@ -2,6 +2,7 @@ package com.example.mycoupon.member;
 
 import com.example.mycoupon.domain.member.Member;
 import com.example.mycoupon.domain.member.MemberRepository;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -70,4 +71,6 @@ public class MemberRepositoryTest {
         assertThat(entityManager.find(Member.class, m.getId())).isEqualTo(result);
 
     }
+
+    // TODO: add invalid save() (raise exception)
 }

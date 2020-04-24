@@ -1,5 +1,6 @@
 package com.example.mycoupon.coupon;
 
+import com.example.mycoupon.common.ValidationRegex;
 import com.example.mycoupon.domain.coupon.Coupon;
 import com.example.mycoupon.domain.coupon.CouponRepository;
 import com.example.mycoupon.domain.couponInfo.CouponInfo;
@@ -14,10 +15,12 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import javax.validation.ConstraintViolationException;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
+import java.util.regex.Pattern;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -37,8 +40,7 @@ public class CouponRepositoryTest {
         // insert dummy data.
         for(int i=0 ; i<10 ; i++) {
             Coupon coupon = Coupon.builder()
-                    .code("code" + i)
-                    .createdAt(new Date())
+                    .code(UUID.randomUUID().toString())
                     .build();
             coupon = this.entityManager.persist(coupon);
 
@@ -85,10 +87,15 @@ public class CouponRepositoryTest {
 
     @Test
     public void findByCode() throws Exception {
-        String findCode = "code1";
-        Coupon coupon = couponRepository.findByCode(findCode);
-        assertThat(coupon).isNotNull();
-        assertThat(coupon.getCode()).isEqualTo(findCode);
+        String code = UUID.randomUUID().toString();
+        Coupon coupon = Coupon.builder()
+                .code(code)
+                .build();
+        coupon = this.entityManager.persist(coupon);
+
+        Coupon result = couponRepository.findByCode(code);
+        assertThat(result).isNotNull();
+        assertThat(result.getCode()).isEqualTo(code);
     }
 
     @Test
@@ -109,12 +116,20 @@ public class CouponRepositoryTest {
 
     @Test
     public void save() throws Exception {
+        String code = UUID.randomUUID().toString();
         Coupon coupon = Coupon.builder()
-                .code(UUID.randomUUID().toString())
-                .createdAt(new Date())
+                .code(code)
+                .build();
+
+        Coupon result = couponRepository.save(coupon);
+        assertThat(result).isEqualTo(coupon);
+    }
+
+    @Test(expected = ConstraintViolationException.class)
+    public void saveInvalidUUIDCode() throws Exception {
+        Coupon coupon = Coupon.builder()
+                .code("test123")
                 .build();
         Coupon result = couponRepository.save(coupon);
-
-        assertThat(result).isEqualTo(coupon);
     }
 }
