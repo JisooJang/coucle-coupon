@@ -36,7 +36,7 @@ public class CouponController {
     // 1. 랜덤한 코드의 쿠폰을 N개 생성하여 데이터베이스에 보관하는 API를 구현하세요.
     @PostMapping("/{num}")
     public ResponseEntity<?> saveCoupon(@PathVariable("num") int num, @RequestAttribute long memberId) {
-        if(num >= 100) {
+        if(num > 1000) {
             return ResponseEntity.badRequest().build();
         }
         couponservice.bulkSave(num);
@@ -72,7 +72,8 @@ public class CouponController {
     @PutMapping("/{coupon_code}")
     public ResponseEntity<?> useCoupon(@PathVariable("coupon_code") String couponCode,
                                        @RequestAttribute("memberId") long memberId) throws CouponNotFoundException {
-        couponservice.updateIsEnabledCouponById(couponCode, memberId, false);
+        couponservice.validateCouponCode(couponCode);
+        couponservice.updateIsEnabledCouponById(couponCode, memberId, true);
         return ResponseEntity.ok().build();
     }
 
@@ -80,7 +81,8 @@ public class CouponController {
     @PutMapping("/{coupon_code}/cancel")
     public ResponseEntity<?> cancelUseCoupon(@PathVariable("coupon_code") String couponCode,
                                              @RequestAttribute("memberId") long memberId) throws CouponNotFoundException {
-        couponservice.updateIsEnabledCouponById(couponCode, memberId,true);
+        couponservice.validateCouponCode(couponCode);
+        couponservice.updateIsEnabledCouponById(couponCode, memberId,false);
         return ResponseEntity.ok().build();
     }
 
