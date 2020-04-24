@@ -3,7 +3,6 @@ package com.example.mycoupon.couponinfo;
 import com.example.mycoupon.domain.coupon.Coupon;
 import com.example.mycoupon.domain.couponInfo.CouponInfo;
 import com.example.mycoupon.domain.couponInfo.CouponInfoRepository;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +12,8 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.Date;
 import java.util.UUID;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 @RunWith(SpringRunner.class)
 @DataJpaTest
@@ -36,6 +37,8 @@ public class CouponInfoRepositoryTest {
                 .isUsed(false)
                 .coupon(coupon)
                 .build();
-        couponInfoRepository.save(info);
+        CouponInfo result = couponInfoRepository.save(info);
+
+        assertThat(entityManager.find(CouponInfo.class, info.getCouponId())).isEqualTo(result);
     }
 }
