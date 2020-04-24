@@ -30,6 +30,7 @@ dependencies {
         exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
     }
     testImplementation 'org.springframework.security:spring-security-test'
+    testCompile("org.springframework.boot:spring-boot-starter-test")
     testCompileOnly 'junit:junit:4.12' // available JUnit4 versions
 }
 
