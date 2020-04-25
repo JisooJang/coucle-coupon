@@ -5,11 +5,12 @@ import com.example.mycoupon.domain.member.MemberService;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.test.context.junit4.SpringRunner;
 
-@RunWith(SpringRunner.class)
+@RunWith(MockitoJUnitRunner.class)
 public class MemberServiceTest {
     @MockBean
     private MemberRepository memberRepository;
@@ -17,16 +18,11 @@ public class MemberServiceTest {
     @MockBean
     private PasswordEncoder passwordEncoder;
 
+    @InjectMocks
     private MemberService memberService;
-
-    @Before
-    public void before() {
-        this.memberService = new MemberService(memberRepository, passwordEncoder);
-    }
 
     @Test
     public void signUp() {
-
     }
 
     @Test

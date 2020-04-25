@@ -2,24 +2,25 @@ package com.example.mycoupon.coupon;
 
 import com.example.mycoupon.domain.coupon.Coupon;
 import com.example.mycoupon.domain.coupon.CouponService;
+import com.example.mycoupon.domain.couponInfo.CouponInfo;
 import com.example.mycoupon.domain.couponInfo.CouponInfoRepository;
 import com.example.mycoupon.domain.coupon.CouponRepository;
 import com.example.mycoupon.domain.member.Member;
 import com.example.mycoupon.exceptions.CouponMemberNotMatchException;
 import com.example.mycoupon.exceptions.CouponNotFoundException;
+import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-import java.util.Calendar;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 import static org.mockito.BDDMockito.given;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -33,19 +34,10 @@ public class CouponServiceTest {
     @Mock
     private CouponInfoRepository couponInfoRepository;
 
-    @Mock
-    private Calendar calendar;
-
     @InjectMocks
     private CouponService couponService;
 
     private final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
-
-//    @Before
-//    public void before() {
-//        this.calendar = Calendar.getInstance();
-//        this.couponService = new CouponService(couponRepository, couponInfoRepository, calendar);
-//    }
 
     @Test
     public void save() {
@@ -77,12 +69,15 @@ public class CouponServiceTest {
 
     @Test
     public void assignToUserBeforeHaveToSaveCoupon() {
-        given(this.couponRepository.findByFreeUser()).willReturn(null);
+
 
         Member member = Member.builder()
                 .mediaId("test1234")
                 .password(this.passwordEncoder.encode("qwer1234!"))
                 .build();
+        given(this.couponRepository.findByFreeUser()).willReturn(null);
+//        given(this.couponService.save(member)).willReturn(
+//                Coupon.builder().code(UUID.randomUUID().toString()).build());
 
         String couponCode = couponService.assignToUser(member);
         assertThat(couponCode).isNotNull();
@@ -116,7 +111,17 @@ public class CouponServiceTest {
 
     @Test
     public void updateIsEnabledCouponById() {
-        couponService.updateIsEnabledCouponById("test1234", 1L, true);
+        String testCode = UUID.randomUUID().toString();
+        Member m = Member.builder()
+                .mediaId("test1234")
+                .password(passwordEncoder.encode("test1234!"))
+                .build();
+        Coupon coupon = Coupon.builder().code(testCode).member(m).build();
+        CouponInfo info = CouponInfo.builder().isUsed(false).coupon(coupon).build();
+        coupon.setCouponInfo(info);
+        given(this.couponRepository.findByCode(testCode)).willReturn(coupon);
+
+        couponService.updateIsEnabledCouponById(testCode, m.getId(), true);
     }
 
 
@@ -124,7 +129,7 @@ public class CouponServiceTest {
     public void findExpiredTodayNone() {
         given(couponRepository.findByExpiredToday()).willReturn(null);
         List<Coupon> result = couponService.findExpiredToday();
-        assertThat(result.size()).isEqualTo(0);
+        assertThat(result).isNull();
     }
 
     @Test
