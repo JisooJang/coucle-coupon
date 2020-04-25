@@ -61,6 +61,7 @@ public class CouponService {
     // TODO: 트랜잭션 격리 레벨 설정
     @Transactional
     public Coupon save(Member member) {
+        /* member 매개변수는 null로 넘어올 수 있다. (유저에게 할당하기 전에 쿠폰을 생성할 때) */
         Coupon coupon;
         Date nowDate = new Date();
         if(member == null) {

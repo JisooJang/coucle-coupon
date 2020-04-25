@@ -4,13 +4,13 @@ import com.example.mycoupon.utils.ValidationRegex;
 import com.example.mycoupon.exceptions.IllegalArgumentException;
 import com.example.mycoupon.payload.UserModel;
 import lombok.extern.slf4j.Slf4j;
-import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import javax.validation.ConstraintViolationException;
 import java.util.Optional;
 import java.util.regex.Pattern;
 
@@ -48,6 +48,8 @@ public class MemberService {
             } else {
                 throw ex;
             }
+        } catch(ConstraintViolationException ex) {
+            throw new IllegalArgumentException("Invalid arguments.");
         }
 
     }
