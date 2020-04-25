@@ -1,7 +1,9 @@
 package com.example.mycoupon.config;
 
-import com.example.mycoupon.security.CustomUserDetailsService;
-import com.example.mycoupon.domain.member.MemberService;
+import com.example.mycoupon.config.security.CustomUserDetailsService;
+import com.example.mycoupon.config.security.filters.JwtAuthenticationFilter;
+import com.example.mycoupon.config.security.filters.JwtAuthorizationFilter;
+import com.example.mycoupon.config.security.filters.SignUpFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -16,16 +18,14 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
-    @Autowired
-    private MemberService memberService;
-
     @Bean
-    PasswordEncoder passwordEncoder(){
+    public PasswordEncoder passwordEncoder(){
         return new BCryptPasswordEncoder();
     }
 
@@ -48,8 +48,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         return new JwtAuthorizationFilter(manager);
     }
 
-    private SignUpFilter signUpFilter(AuthenticationManager manager) {
-        return new SignUpFilter(manager, memberService);
+    @Bean
+    SignUpFilter signUpFilter(AuthenticationManager manager) {
+        return new SignUpFilter(manager);
     }
 
     @Override
@@ -66,7 +67,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                     .antMatchers(HttpMethod.POST, "/login").permitAll()
                     //.antMatchers(HttpMethod.GET, "/h2-console/**").permitAll()
                     .anyRequest().authenticated();
-
     }
 
     @Override

@@ -1,10 +1,12 @@
-package com.example.mycoupon.config;
+package com.example.mycoupon.config.security.filters;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
+import com.example.mycoupon.exceptions.IllegalArgumentException;
+import com.example.mycoupon.exceptions.SignUpFailedException;
 import com.example.mycoupon.payload.UserModel;
-import com.example.mycoupon.security.JWTSecurityConstants;
-import com.example.mycoupon.security.SecurityMember;
+import com.example.mycoupon.config.security.JWTSecurityConstants;
+import com.example.mycoupon.config.security.SecurityMember;
 import com.example.mycoupon.domain.member.MemberService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,28 +17,30 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+import org.springframework.web.server.ResponseStatusException;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.Collections;
 import java.util.Date;
 
 public class SignUpFilter extends AbstractAuthenticationProcessingFilter {
-    private final MemberService memberService;
+    @Autowired
+    private MemberService memberService;
 
     @Autowired
-    protected SignUpFilter(AuthenticationManager authenticationManager, MemberService memberService) {
+    public SignUpFilter(AuthenticationManager authenticationManager) {
         super(new AntPathRequestMatcher("/signup"));
         setAuthenticationManager(authenticationManager);
-        this.memberService = memberService;
     }
 
     @Override
     public Authentication attemptAuthentication(HttpServletRequest req,
-                                                HttpServletResponse res) throws AuthenticationException {
+                                                HttpServletResponse res) throws AuthenticationException, IOException {
         UserModel model = null;
 
         try {
@@ -47,7 +51,12 @@ public class SignUpFilter extends AbstractAuthenticationProcessingFilter {
         }
 
         // save Member DB
-        memberService.signUp(model);
+        try {
+            memberService.signUp(model);
+        } catch(IllegalArgumentException e) {
+            //throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getLocalizedMessage(), e);
+            throw new SignUpFailedException(e.getLocalizedMessage(), e, HttpStatus.BAD_REQUEST.value());
+        }
 
         // Authenticate user
         return getAuthenticationManager().authenticate(
@@ -82,5 +91,22 @@ public class SignUpFilter extends AbstractAuthenticationProcessingFilter {
 
         res.addHeader(JWTSecurityConstants.HEADER_STRING, JWTSecurityConstants.TOKEN_PREFIX + token);
         res.setStatus(HttpStatus.CREATED.value());
+    }
+
+    @Override
+    protected void unsuccessfulAuthentication(HttpServletRequest request,
+                                              HttpServletResponse response, AuthenticationException failed)
+            throws IOException, ServletException {
+        int statusCode;
+
+        if(failed.getCause() instanceof IllegalArgumentException) {
+            statusCode = HttpStatus.BAD_REQUEST.value();
+        } else {
+            statusCode = HttpStatus.FORBIDDEN.value();
+        }
+
+        response.setStatus(statusCode);
+        PrintWriter writer = response.getWriter();
+        writer.println(failed.getLocalizedMessage());
     }
 }

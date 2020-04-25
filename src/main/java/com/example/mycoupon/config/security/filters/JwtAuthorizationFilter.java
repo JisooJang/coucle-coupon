@@ -1,8 +1,8 @@
-package com.example.mycoupon.config;
+package com.example.mycoupon.config.security.filters;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
-import com.example.mycoupon.security.JWTSecurityConstants;
+import com.example.mycoupon.config.security.JWTSecurityConstants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
