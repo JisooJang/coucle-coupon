@@ -33,8 +33,8 @@ public class CouponInfoRepositoryTest {
         coupon = entityManager.persist(coupon);
 
         CouponInfo info = CouponInfo.builder()
+                .couponId(coupon.getId())
                 .isUsed(false)
-                .coupon(coupon)
                 .build();
         CouponInfo result = couponInfoRepository.save(info);
 
