@@ -78,7 +78,7 @@ public class MemberRepositoryTest {
         String testMediaId = "test1234";
         Member m = Member.builder()
                 .mediaId(testMediaId)
-                .password(passwordEncoder.encode("qwer1234"))
+                .password("qwer124")
                 .build();
 
         Member result = memberRepository.save(m);
