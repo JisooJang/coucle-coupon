@@ -15,11 +15,9 @@ import java.net.URI;
 import java.util.List;
 import java.util.Optional;
 
-
 /*
-TODO:
 JwyAuthorizationFilter 로직을 컨트롤러 진입 전에 먼저 타서 헤더의 토큰이 유효한 지 검사 후 ->
-토큰이 유효하면, 토큰을 까서 user_id를 컨트롤러로 리턴한다.
+토큰이 유효하면, memberId를 Request attribute에 담아 컨트롤러로 전달한다.
  */
 @RestController
 @RequestMapping("/coupon")
@@ -60,7 +58,7 @@ public class CouponController {
 
     // 3. 사용자에게 지급된 쿠폰을 조회하는 API를 구현하세요.
     @GetMapping("/user")
-    public ResponseEntity<List<Coupon>> getUsersCoupons(@RequestAttribute("memberId") long memberId) throws MemberNotFoundException {
+    public ResponseEntity<List<Coupon>> getUserCoupons(@RequestAttribute("memberId") long memberId) throws MemberNotFoundException {
         List<Coupon> coupons = couponservice.findByMember(memberId);
         if(coupons == null || coupons.size() == 0) {
             return ResponseEntity.noContent().build();
