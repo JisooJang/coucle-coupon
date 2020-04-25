@@ -1,6 +1,6 @@
 package com.example.mycoupon.domain.coupon;
 
-import com.example.mycoupon.common.ValidationRegex;
+import com.example.mycoupon.utils.ValidationRegex;
 import com.example.mycoupon.domain.couponInfo.CouponInfo;
 import com.example.mycoupon.domain.member.Member;
 import com.example.mycoupon.exceptions.CouponMemberNotMatchException;
@@ -24,8 +24,6 @@ public class CouponService {
     private final CouponInfoRepository couponInfoRepository;
 
     private final Calendar calendar;
-
-    //private final EntityManager entityManager;
 
     @Autowired
     public CouponService(CouponRepository couponRepository, CouponInfoRepository couponInfoRepository,
@@ -79,7 +77,8 @@ public class CouponService {
         }
 
         Coupon couponResult = couponRepository.save(coupon);
-        CouponInfo couponInfo = CouponInfo.builder().coupon(couponResult).isUsed(false).build();
+        CouponInfo couponInfo = CouponInfo.builder().couponId(couponResult.getId()).isUsed(false).build();
+
         couponInfoRepository.save(couponInfo);
 
         return couponResult;
@@ -96,7 +95,6 @@ public class CouponService {
             coupon.setMember(member);  // update SQL
             coupon.setAssignedAt(assignedAt);
             coupon.setExpiredAt(getRandomExpiredAt(assignedAt));
-            //TODO: assignedAt, expiredAt 변경 감지가 적용 안됨. member는 변경 감지 적용하여 update 쿼리 실행
         }
         return coupon.getCode();
     }

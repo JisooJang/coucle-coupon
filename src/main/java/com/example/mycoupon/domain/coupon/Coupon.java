@@ -1,6 +1,6 @@
 package com.example.mycoupon.domain.coupon;
 
-import com.example.mycoupon.common.ValidationRegex;
+import com.example.mycoupon.utils.ValidationRegex;
 import com.example.mycoupon.domain.couponInfo.CouponInfo;
 import com.example.mycoupon.domain.member.Member;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -47,7 +47,7 @@ public class Coupon {
     @JoinColumn(name = "member_id")
     private Member member; // FK
 
-    // TODO : 연관관계의 주인은 Coupon entity
-    @OneToOne(mappedBy = "coupon")
+    @OneToOne
+    @PrimaryKeyJoinColumn
     private CouponInfo couponInfo;
 }
