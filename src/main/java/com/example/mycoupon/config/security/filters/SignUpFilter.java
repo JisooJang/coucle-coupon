@@ -55,7 +55,7 @@ public class SignUpFilter extends AbstractAuthenticationProcessingFilter {
             memberService.signUp(model);
         } catch(IllegalArgumentException e) {
             //throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getLocalizedMessage(), e);
-            throw new SignUpFailedException(e.getLocalizedMessage(), e, HttpStatus.BAD_REQUEST.value());
+            throw new SignUpFailedException(e.getLocalizedMessage(), e);
         }
 
         // Authenticate user
