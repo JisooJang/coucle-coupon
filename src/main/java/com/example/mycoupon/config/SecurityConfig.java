@@ -1,9 +1,9 @@
 package com.example.mycoupon.config;
 
 import com.example.mycoupon.config.security.CustomUserDetailsService;
-import com.example.mycoupon.config.security.filters.JwtAuthenticationFilter;
+import com.example.mycoupon.config.security.filters.JwtAuthenticationSignInFilter;
 import com.example.mycoupon.config.security.filters.JwtAuthorizationFilter;
-import com.example.mycoupon.config.security.filters.SignUpFilter;
+import com.example.mycoupon.config.security.filters.JwtAuthenticationSignUpFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -18,7 +18,6 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
@@ -40,8 +39,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         return super.authenticationManagerBean();
     }
 
-    private JwtAuthenticationFilter jwtAuthenticationFilter(AuthenticationManager manager) throws Exception {
-        return new JwtAuthenticationFilter(manager);
+    private JwtAuthenticationSignInFilter jwtAuthenticationFilter(AuthenticationManager manager) throws Exception {
+        JwtAuthenticationSignInFilter filter = new JwtAuthenticationSignInFilter(manager);
+        filter.setFilterProcessesUrl("/signin");
+        return filter;
     }
 
     private JwtAuthorizationFilter jwtAuthorizationFilter(AuthenticationManager manager) throws Exception {
@@ -49,8 +50,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     }
 
     @Bean
-    SignUpFilter signUpFilter(AuthenticationManager manager) {
-        return new SignUpFilter(manager);
+    JwtAuthenticationSignUpFilter signUpFilter(AuthenticationManager manager) {
+        return new JwtAuthenticationSignUpFilter(manager);
     }
 
     @Override

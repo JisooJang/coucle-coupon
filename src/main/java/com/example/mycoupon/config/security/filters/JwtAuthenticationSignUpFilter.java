@@ -28,12 +28,12 @@ import java.io.PrintWriter;
 import java.util.Collections;
 import java.util.Date;
 
-public class SignUpFilter extends AbstractAuthenticationProcessingFilter {
+public class JwtAuthenticationSignUpFilter extends AbstractAuthenticationProcessingFilter {
     @Autowired
     private MemberService memberService;
 
     @Autowired
-    public SignUpFilter(AuthenticationManager authenticationManager) {
+    public JwtAuthenticationSignUpFilter(AuthenticationManager authenticationManager) {
         super(new AntPathRequestMatcher("/signup"));
         setAuthenticationManager(authenticationManager);
     }
