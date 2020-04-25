@@ -1,5 +1,6 @@
 package com.example.mycoupon.domain.member;
 
+import com.example.mycoupon.utils.ValidationRegex;
 import com.example.mycoupon.exceptions.IllegalArgumentException;
 import com.example.mycoupon.payload.UserModel;
 import lombok.extern.slf4j.Slf4j;
@@ -11,6 +12,7 @@ import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.util.Optional;
+import java.util.regex.Pattern;
 
 @Slf4j
 @Transactional
@@ -25,9 +27,17 @@ public class MemberService {
         this.passwordEncoder = passwordEncoder;
     }
 
+    public void validationPassword(String password) {
+        if(!Pattern.matches(ValidationRegex.PASSWORD, password)) {
+            throw new IllegalArgumentException(
+                    "password should be use alphabet, number, special-character at least 1 time each." +
+                            "And length should be over 8 characters.");
+        }
+    }
     public Member signUp(UserModel model) {
         // password 암호화 저장
         // 트랜잭션 레벨 설정
+        validationPassword(model.getPassword());
         Member member = new Member(model.getId(), model.getPassword());
         member.setPassword(passwordEncoder.encode(member.getPassword()));
         try {
