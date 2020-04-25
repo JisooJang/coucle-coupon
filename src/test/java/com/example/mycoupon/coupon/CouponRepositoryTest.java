@@ -1,11 +1,11 @@
 package com.example.mycoupon.coupon;
 
-import com.example.mycoupon.common.ValidationRegex;
 import com.example.mycoupon.domain.coupon.Coupon;
 import com.example.mycoupon.domain.coupon.CouponRepository;
 import com.example.mycoupon.domain.couponInfo.CouponInfo;
 import com.example.mycoupon.domain.member.Member;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,49 +34,19 @@ public class CouponRepositoryTest {
 
     private final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
-    @Before
-    public void prepareData() throws Exception {
-        // insert dummy data.
-        for(int i=0 ; i<10 ; i++) {
-            Coupon coupon = Coupon.builder()
-                    .code(UUID.randomUUID().toString())
-                    .build();
-            coupon = this.entityManager.persist(coupon);
-
-            CouponInfo couponInfo = CouponInfo.builder()
-                    .coupon(coupon)
-                    .isUsed(false)
-                    .build();
-            couponInfo = this.entityManager.persist(couponInfo);
-        }
-
-        Member member = Member.builder()
-                .mediaId("test1")
-                .password(passwordEncoder.encode("qwer1234!"))
-                .build();
-        member = this.entityManager.persist(member);
-
-        Coupon coupon1 = this.entityManager.find(Coupon.class, 1L);
-        Coupon coupon2 = this.entityManager.find(Coupon.class, 2L);
-
-        Date nowDate = new Date();
-        coupon1.setMember(member);
-        coupon1.setAssignedAt(nowDate);
-        coupon1.setExpiredAt(nowDate);
-
-        Calendar cal = Calendar.getInstance();
-        cal.setTime(nowDate);
-        cal.add(Calendar.DATE, 2);
-
-        coupon2.setMember(member);
-        coupon2.setAssignedAt(nowDate);
-        coupon2.setExpiredAt(cal.getTime());
-
-        this.entityManager.flush();  // UPDATE DB 반영
-    }
-
     @Test
     public void findByFreeUsers() throws Exception {
+        Coupon coupon = Coupon.builder()
+                .code(UUID.randomUUID().toString())
+                .build();
+        coupon = this.entityManager.persist(coupon);
+
+        CouponInfo couponInfo = CouponInfo.builder()
+                .couponId(coupon.getId())
+                .isUsed(false)
+                .build();
+        couponInfo = this.entityManager.persist(couponInfo);
+
         Coupon freeCoupon = couponRepository.findByFreeUser();
         assertThat(freeCoupon).isNotNull();
         assertThat(freeCoupon.getMember()).isNull();
@@ -99,18 +69,43 @@ public class CouponRepositoryTest {
 
     @Test
     public void findByMemberId() throws Exception {
-        List<Coupon> results = couponRepository.findByMemberId(1);
+        Member member = Member.builder()
+                .mediaId("test1")
+                .password(passwordEncoder.encode("qwer1234!"))
+                .build();
+        member = this.entityManager.persist(member);
+
+        for(int i=0 ; i<2 ; i++) {
+            Coupon coupon = Coupon.builder()
+                    .code(UUID.randomUUID().toString())
+                    .member(member)
+                    .build();
+            coupon = this.entityManager.persist(coupon);
+
+            CouponInfo couponInfo = CouponInfo.builder()
+                    .couponId(coupon.getId())
+                    .isUsed(false)
+                    .build();
+            couponInfo = this.entityManager.persist(couponInfo);
+        }
+
+
+        List<Coupon> results = couponRepository.findByMemberId(member.getId());
         assertThat(results).size().isEqualTo(2);
-        assertThat(results.get(0).getMember().getId()).isEqualTo(1);
-        assertThat(results.get(1).getMember().getId()).isEqualTo(1);
+        assertThat(results.get(0).getMember().getId()).isEqualTo(member.getId());
+        assertThat(results.get(1).getMember().getId()).isEqualTo(member.getId());
     }
 
     @Test
     public void findByExpiredToday() throws Exception {
+        Coupon coupon = Coupon.builder()
+                .code(UUID.randomUUID().toString())
+                .expiredAt(new Date())
+                .build();
+        coupon = this.entityManager.persist(coupon);
+
         List<Coupon> results = couponRepository.findByExpiredToday();
         assertThat(results).size().isEqualTo(1);
-        assertThat(results.get(0).getMember()).isNotNull();
-        assertThat(results.get(0).getAssignedAt()).isNotNull();
     }
 
     @Test
