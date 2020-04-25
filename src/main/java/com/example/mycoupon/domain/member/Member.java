@@ -20,6 +20,7 @@ public class Member {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
+    @Size(min = 3, max = 30)
     @NotBlank
     @Column(name = "media_id", unique = true, nullable = false, length = 30)
     private String mediaId;  // TODO: add index
