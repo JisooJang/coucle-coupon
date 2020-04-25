@@ -1,12 +1,11 @@
 package com.example.mycoupon.domain.member;
 
-import com.example.mycoupon.common.ValidationRegex;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.Pattern;
+import javax.validation.constraints.Size;
 import java.util.Date;
 
 @Getter
@@ -25,8 +24,8 @@ public class Member {
     @Column(name = "media_id", unique = true, nullable = false, length = 30)
     private String mediaId;  // TODO: add index
 
+    @Size(min = 8, max = 100)
     @NotBlank
-    @Pattern(regexp = ValidationRegex.PASSWORD)
     @Column(name = "password", nullable = false, length = 100)
     private String password;
 
