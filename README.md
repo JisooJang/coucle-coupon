@@ -67,11 +67,15 @@ h2-database
 ```
 
 ## Problem Solving
-1. JWT authentication (signup / signin 접근)
-  - signp
+(class diagram 사용 출처 : https://online.visual-paradigm.com/)
+- JWT authentication (signup / signin 접근)
+1. signp
 <img width="500" alt="JwtAuthenticationSignUpFilter" src="https://user-images.githubusercontent.com/26767161/80301698-8d397b00-87e0-11ea-8651-160b793d6d28.PNG">
+- spring security의 `AbstractAuthenticationProcessingFilter`를 상속받아 유저의 가입(인증) 성공시 JWT를 발급하도록 하였다. <br>
+- Override한 `attemptAuthentication` method에서 가입 요청으로 넘어온 데이터를 `UserModel` 클래스에 매핑하고, <br>
+- 주입받은 `MemberService` 빈을 이용해 `signup` method를 호출한다. <br>
 
-  - signin
+2. signin
 <img width="500" alt="JwtAuthenticationSignInFilter" src="https://user-images.githubusercontent.com/26767161/80301668-59f6ec00-87e0-11ea-9d5e-5191e7ea54cd.PNG">
 2. JWT authorization 
 <img width="500" alt="JwtAuthorizationFilter" src="https://user-images.githubusercontent.com/26767161/80301701-9aef0080-87e0-11ea-8981-f454127f74ad.PNG">
