@@ -8,7 +8,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 public class CustomUserDetailsService implements UserDetailsService {
-    private MemberRepository memberRepository; // 필드 주입 문제 없을 지 생각해 볼 것
+    private MemberRepository memberRepository;
 
     @Autowired
     public void setMemberRepository(MemberRepository memberRepository) {
