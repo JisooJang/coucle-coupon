@@ -1,6 +1,7 @@
 package com.example.mycoupon.config;
 
 import com.example.mycoupon.config.security.CustomUserDetailsService;
+import com.example.mycoupon.config.security.filters.CustomAuthenticationEntryPoint;
 import com.example.mycoupon.config.security.filters.JwtAuthenticationSignInFilter;
 import com.example.mycoupon.config.security.filters.JwtAuthorizationFilter;
 import com.example.mycoupon.config.security.filters.JwtAuthenticationSignUpFilter;
@@ -18,6 +19,7 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
@@ -54,6 +56,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         return new JwtAuthenticationSignUpFilter(manager);
     }
 
+    private AuthenticationEntryPoint authenticationEntryPoint() {
+        return new CustomAuthenticationEntryPoint();
+    }
+
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http
@@ -66,7 +72,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .authorizeRequests()
                     .antMatchers(HttpMethod.POST, "/signup").permitAll()
                     .antMatchers(HttpMethod.POST, "/login").permitAll()
-                    .anyRequest().authenticated();
+                    .anyRequest().authenticated()
+                .and()
+                .exceptionHandling().authenticationEntryPoint(authenticationEntryPoint());
     }
 
     @Override
