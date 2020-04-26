@@ -87,12 +87,15 @@ h2-database
 
 ### JWT authorization 
 <img width="500" alt="JwtAuthorizationFilter" src="https://user-images.githubusercontent.com/26767161/80301701-9aef0080-87e0-11ea-8981-f454127f74ad.PNG">
-- spring security의 `BasicAuthenticationFilter`를 상속받아 /coupon/** API 요청이 들어오면 JWT를 먼저 검사하도록 하였다. <br> 
+- spring security의 `BasicAuthenticationFilter`를 상속받아 `/coupon/**` API 요청이 들어오면 JWT를 먼저 검사하도록 하였다. <br> 
 - `doFilterInternal` method에서 요청 헤더를 검사하고 토큰이 올바른지 검증 후 인증 성공 처리를 한다. <br>
-- 이 과정에서 인증이 제대로 성공했다면, request에 memberId 정보를 담아 controller 로직을 타도록 한다. <br>
+- 이 과정에서 인증이 제대로 성공했다면, request에 `memberId` 정보를 담아 Controller 로직을 타도록 한다. <br>
 
 ### Entity 설계 및 연관관계
-
+- **Conpon - Member (ManyToOne)** 단방향 연관 관계. Coupon entity(Many)에서 Member 필드를 가지도록 설계하였다.
+- 유저는 쿠폰을 가지고 있을 수도 있고, 하나도 가지고 없을 수도 있다.
+- **Coupon - CouponInfo (OneToOne)** 단방향 연관 관계. Coupon entity에서 CouponInfo 필드를 가지도록 설계하였다.
+- 쿠폰은 반드시 쿠폰 정보를 필수로 가진다.
 ## Schema
 ![](https://user-images.githubusercontent.com/26767161/80300710-f964b080-87d9-11ea-978c-9b3738096eb2.PNG)
 (사용 출처 : https://dbdiagram.io/)
