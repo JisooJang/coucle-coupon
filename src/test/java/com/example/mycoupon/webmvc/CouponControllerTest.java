@@ -13,6 +13,7 @@ import com.example.mycoupon.service.MemberService;
 import com.example.mycoupon.exceptions.CouponMemberNotMatchException;
 import com.example.mycoupon.exceptions.CouponNotFoundException;
 import com.example.mycoupon.exceptions.IllegalArgumentException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -262,6 +263,47 @@ public class CouponControllerTest {
         mvc.perform(MockMvcRequestBuilders
                 .put("/coupon/" + fakeCode)
                 .header("Authorization", "Bearer " + getExpiredJWT())
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    public void CouponGetExpiredTodaySuccess() throws Exception {
+        Coupon coupon = Coupon.builder().code(UUID.randomUUID().toString()).build();
+        List<Coupon> result = Collections.singletonList(coupon);
+        given(couponService.findExpiredToday()).willReturn(result);
+        mvc.perform(MockMvcRequestBuilders
+                .get("/coupon/expired")
+                .header("Authorization", "Bearer " + getJWT())
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().string(new ObjectMapper().writeValueAsString(result)));
+    }
+
+    @Test
+    public void CouponGetExpiredTodaySuccessNoContent() throws Exception {
+        given(couponService.findExpiredToday()).willReturn(null);
+        mvc.perform(MockMvcRequestBuilders
+                .get("/coupon/expired")
+                .header("Authorization", "Bearer " + getJWT())
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNoContent());
+    }
+
+    @Test
+    public void CouponGetExpiredTodayFailureExpiredToken() throws Exception {
+        mvc.perform(MockMvcRequestBuilders
+                .get("/coupon/expired")
+                .header("Authorization", "Bearer " + getExpiredJWT())
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    public void CouponGetExpiredTodayFailureInvalidToken() throws Exception {
+        mvc.perform(MockMvcRequestBuilders
+                .get("/coupon/expired")
+                .header("Authorization", "Bearer " + "fakeInvalidToken")
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isForbidden());
     }
