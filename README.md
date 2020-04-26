@@ -112,8 +112,35 @@ h2-database
 - `controller`에서는 내용의 존재여부, 에러 발생 여부에 따라 알맞은 status_code와 Coupon 데이터를 리턴한다.
 
 ### Test 설계
+테스트 구조는 아래와 같다.
+```
+\---java
+    \---com
+        \---example
+            \---mycoupon
+                |   MycouponApplicationTests.java
+                |
+                +---controller
+                |       CouponControllerTest.java
+                |
+                +---filter
+                |       CouponControllerTest.java
+                |       JwtAuthenticationSingInTest.java
+                |       JwtAuthenticationSingUpTest.java
+                |
+                +---repository
+                |       CouponInfoRepositoryTest.java
+                |       CouponRepositoryTest.java
+                |       MemberRepositoryTest.java
+                |
+                \---service
+                        CouponServiceTest.java
+                        MemberServicePasswordValidationTest.java
+                        MemberServiceTest.java
+```
 - repository, service, controller 별로 의존 관계에 있는 빈들을 `Mock`하여 unit test 코드를 작성하였다.
-- unit test 이외에 security filter 로직을 타야하는 테스트 검증도 필요하다고 판단하여, spring의 `@WebMvcTest`를 이용해
+- unit test 이외에 security filter 로직을 타야하는 테스트 검증도 필요하다고 판단하여,
+ Coupon API의 경우는 spring의 `@WebMvcTest`를 이용, signin/sinup API의 경우 `@SpringBootTest`를 통해 
 endpoint로 직접 요청하는 테스트를 추가하였다.
 
 ### 쿠폰 만료일 스케줄링 설계
