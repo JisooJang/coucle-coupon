@@ -13,6 +13,7 @@ lombok
 h2-database
 ```
 - test : Junit4, JUnitParams
+- database : 
 
 ## Project structure
 ```
@@ -134,7 +135,9 @@ gradlew test
 ```
 
 ## API specification
-**기본 요청 주소 : `http://localhost:8080/`**
+**기본 요청 주소 : `http://localhost:8080/`** <br>
+**H2 DB client host : `http://localhost:8080/h2-console`** 
+
 - signup : 
   - endpoint : `/signup`
   - method: `POST`
