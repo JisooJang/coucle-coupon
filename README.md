@@ -13,7 +13,7 @@ java-jwt
 lombok
 h2-database
 ```
-- test : Junit4, JUnitParams
+- test : Junit4, JUnitParams, Mockito
 
 ## Project structure
 ```
