@@ -60,6 +60,7 @@ h2-database
     |       MemberRepository.java
     |
     +---service
+    |       CouponSchedulerService.java
     |       CouponService.java
     |       MemberService.java
     |
