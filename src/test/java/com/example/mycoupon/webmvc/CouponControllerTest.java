@@ -305,6 +305,5 @@ public class CouponControllerTest {
                 .andExpect(status().isForbidden());
     }
 
-
 }
 
