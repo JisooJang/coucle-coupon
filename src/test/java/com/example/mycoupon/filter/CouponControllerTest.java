@@ -1,4 +1,4 @@
-package com.example.mycoupon.webmvc;
+package com.example.mycoupon.filter;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
@@ -8,7 +8,6 @@ import com.example.mycoupon.domain.Coupon;
 import com.example.mycoupon.repository.CouponRepository;
 import com.example.mycoupon.service.CouponService;
 import com.example.mycoupon.domain.Member;
-import com.example.mycoupon.repository.MemberRepository;
 import com.example.mycoupon.service.MemberService;
 import com.example.mycoupon.exceptions.CouponMemberNotMatchException;
 import com.example.mycoupon.exceptions.CouponNotFoundException;

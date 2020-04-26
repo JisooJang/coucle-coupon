@@ -1,4 +1,4 @@
-package com.example.mycoupon.webmvc;
+package com.example.mycoupon.filter;
 
 import com.example.mycoupon.payload.UserModel;
 import com.example.mycoupon.service.MemberService;
