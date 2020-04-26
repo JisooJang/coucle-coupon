@@ -19,6 +19,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 
 // validate requests containing JWTS
@@ -39,8 +40,13 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
             return;
         }
 
-        UsernamePasswordAuthenticationToken authentication = getAuthentication(req);
-        SecurityContextHolder.getContext().setAuthentication(authentication);
+        UsernamePasswordAuthenticationToken authentication = null;
+        try {
+            authentication = getAuthentication(req);
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+        } catch(AuthenticationException ex) {
+            onUnsuccessfulAuthentication(req, res, ex);
+        }
 
         if(authentication != null) {
             req.setAttribute("memberId", Long.parseLong((String)authentication.getPrincipal()));
@@ -60,9 +66,6 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
                         //.getSubject();
                         .getAudience().get(0);
             } catch(JWTDecodeException | InvalidClaimException e) {
-//                response.setStatus(HttpStatus.UNAUTHORIZED.value());
-//                PrintWriter writer = response.getWriter();
-//                writer.println("Invalid Authorization Token.");
                 throw new InvalidTokenException(e, HttpStatus.UNAUTHORIZED.value());
             }
 
@@ -74,12 +77,4 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
         }
         return null;
     }
-
-//    @Override
-//    protected void onUnsuccessfulAuthentication(HttpServletRequest request,
-//                                                HttpServletResponse response, AuthenticationException failed) throws IOException {
-//
-//        System.out.println(request);
-//        System.out.println(response);
-//    }
 }
