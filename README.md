@@ -1,10 +1,7 @@
 # mycoupon-jwt-app
 MyCoupon Rest Spring boot App using JWT authentication / authorization. 
 
-
-***
-
-# Using
+## Using
 - framework : Spring boot 2.2.6 
 - build tool : gradle 6.3
 - dependency :
@@ -17,9 +14,7 @@ h2-database
 ```
 - test : Junit4, JUnitParams
 
-***
-
-# Build
+## How to Build
 ```
 > gradlew build
 ```
