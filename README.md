@@ -66,14 +66,19 @@ h2-database
             ValidationRegex.java
 ```
 
+## Problem Solving
+1.
+
 ## Schema
 ![](https://user-images.githubusercontent.com/26767161/80300710-f964b080-87d9-11ea-978c-9b3738096eb2.PNG)
+(사용 출처 : https://dbdiagram.io/)
+
 ## How to Build
 ```
 gradlew build
 ```
 
-## How to run Spring boot app
+## How to run app
 ```
 gradlew bootrun
 ```
