@@ -93,7 +93,8 @@ h2-database
 - spring security의 `BasicAuthenticationFilter`를 상속받아 `/coupon/**` API 요청이 들어오면 JWT를 먼저 검사하도록 하였다. <br> 
 - `doFilterInternal` method에서 요청 헤더를 검사하고 토큰이 올바른지 검증 후 인증 성공 처리를 한다. <br>
 - 이 과정에서 인증이 제대로 성공했다면, request에 `memberId` 정보를 담아 Controller 로직을 타도록 한다. <br>
-
+- `BasicAuthenticationFilter`는 AuthenticationException을 `AuthenticationEntryPoint`에서 handling 하므로,
+ `CustomAuthenticationEntryPoint`를 작성하여 가능한 에러에 따라 응답코드와 에러메시지를 설정하였다. 
 ***
 
 ### Entity 설계 및 연관관계
