@@ -13,6 +13,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import javax.validation.ConstraintViolationException;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -121,5 +122,36 @@ public class CouponRepositoryTest {
                 .code("test123")
                 .build();
         Coupon result = couponRepository.save(coupon);
+    }
+
+    @Test
+    public void findByExpiredAfter3Days() throws Exception {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(new Date());
+        calendar.add(Calendar.DATE, 3);
+
+        for(int i=0 ; i<2 ; i++) {
+            Coupon coupon = Coupon.builder()
+                    .code(UUID.randomUUID().toString())
+                    .expiredAt(calendar.getTime())
+                    .build();
+            this.entityManager.persist(coupon);
+        }
+
+        List<Coupon> result = couponRepository.findByExpiredAfter3Days();
+        assertThat(result.size()).isEqualTo(2);
+    }
+
+    @Test
+    public void findByExpiredAfter3DaysNone() throws Exception {
+        for(int i=0 ; i<2 ; i++) {
+            Coupon coupon = Coupon.builder()
+                    .code(UUID.randomUUID().toString())
+                    .expiredAt(new Date())
+                    .build();
+            this.entityManager.persist(coupon);
+        }
+        List<Coupon> result = couponRepository.findByExpiredAfter3Days();
+        assertThat(result.size()).isEqualTo(0);
     }
 }
