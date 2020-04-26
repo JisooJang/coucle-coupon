@@ -53,7 +53,6 @@ public class JwtAuthenticationSignUpFilter extends AbstractAuthenticationProcess
         try {
             memberService.signUp(model);
         } catch(IllegalArgumentException e) {
-            //throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getLocalizedMessage(), e);
             throw new SignUpFailedException(e.getLocalizedMessage(), e);
         }
 
@@ -96,9 +95,9 @@ public class JwtAuthenticationSignUpFilter extends AbstractAuthenticationProcess
     protected void unsuccessfulAuthentication(HttpServletRequest request,
                                               HttpServletResponse response, AuthenticationException failed)
             throws IOException, ServletException {
-        int statusCode;
 
-        if(failed.getCause() instanceof IllegalArgumentException) {
+        int statusCode;
+        if(failed instanceof SignUpFailedException) {
             statusCode = HttpStatus.BAD_REQUEST.value();
         } else {
             statusCode = HttpStatus.FORBIDDEN.value();
