@@ -1,4 +1,4 @@
-package com.example.mycoupon.controller;
+package com.example.mycoupon.config;
 
 import com.example.mycoupon.exceptions.CouponMemberNotMatchException;
 import com.example.mycoupon.exceptions.IllegalArgumentException;
