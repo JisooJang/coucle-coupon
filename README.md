@@ -14,6 +14,58 @@ h2-database
 ```
 - test : Junit4, JUnitParams
 
+## Project structure
+```
+-mycoupon
+    |   MycouponApplication.java
+    |
+    +---config
+    |   |   AppConfig.java
+    |   |   CustomControllerAdvice.java
+    |   |   SecurityConfig.java
+    |   |
+    |   \---security
+    |       |   CustomUserDetailsService.java
+    |       |   JWTSecurityConstants.java
+    |       |   SecurityMember.java
+    |       |
+    |       \---filters
+    |               JwtAuthenticationSignInFilter.java
+    |               JwtAuthenticationSignUpFilter.java
+    |               JwtAuthorizationFilter.java
+    |
+    +---controller
+    |       CouponController.java
+    |
+    +---domain
+    |       Coupon.java
+    |       CouponInfo.java
+    |       Member.java
+    |
+    +---exceptions
+    |       CouponMemberNotMatchException.java
+    |       CouponNotFoundException.java
+    |       IllegalArgumentException.java
+    |       InvalidTokenException.java
+    |       MemberNotFoundException.java
+    |       SignUpFailedException.java
+    |
+    +---payload
+    |       UserModel.java
+    |
+    +---repository
+    |       CouponInfoRepository.java
+    |       CouponRepository.java
+    |       MemberRepository.java
+    |
+    +---service
+    |       CouponService.java
+    |       MemberService.java
+    |
+    \---utils
+            ValidationRegex.java
+```
+
 ## How to Build
 ```
 gradlew build
