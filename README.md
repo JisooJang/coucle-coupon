@@ -72,12 +72,18 @@ h2-database
 1. signp
 <img width="500" alt="JwtAuthenticationSignUpFilter" src="https://user-images.githubusercontent.com/26767161/80301698-8d397b00-87e0-11ea-8651-160b793d6d28.PNG">
 - spring security의 `AbstractAuthenticationProcessingFilter`를 상속받아 유저의 가입(인증) 성공시 JWT를 발급하도록 하였다. <br>
-- `attemptAuthentication` method에서 주입받은 memberservice 빈을 이용해 가입 요청을 처리하고, Authentication 객체를 넘겨준다.
-- `successfulAuthentication` method에서는 가입한 유저기반의 JWT 토큰을 생성하여 응답 헤더에 넘겨준다. <br>
-- `unsuccessfulAuthentication` method에서는 인증 Exception 구분에 따라 적당한 status_code와 에러메시지를 리턴한다. <br>
+- `attemptAuthentication` method에서 주입받은 memberservice 빈을 이용해 가입 요청을 처리하고, Authentication 객체를 넘겨준다. <br>
+- `successfulAuthentication` method에서는 가입을 성공한 유저기반의 JWT 토큰을 생성하여 응답 헤더에 넘겨준다. <br>
+- `unsuccessfulAuthentication` method에서는 인증 실패 Exception 구분에 따라 적당한 status_code와 에러메시지를 리턴한다. <br>
+
+***
 
 2. signin
 <img width="500" alt="JwtAuthenticationSignInFilter" src="https://user-images.githubusercontent.com/26767161/80301668-59f6ec00-87e0-11ea-9d5e-5191e7ea54cd.PNG">
+- spring security의 `UsernamePasswordAuthenticationFilter`를 상속받아 유저의 로그인 인증 성공시 JWT를 발급하도록 하였다. <br> 
+- `attemptAuthentication` method에서 authenticationmanger를 통해 유저의 Authentication 객체를 넘겨준다. <br>
+- `successfulAuthentication` method에서는 로그인을 성공항 유저기반의 JWT 토큰을 생성하여 응답 헤더에 넘겨준다. <br>
+- `unsuccessfulAuthentication` method에서는 인증 실패 Exception 구분에 따라 적당한 status_code와 에러메시지를 리턴한다. <br>
 
 ### JWT authorization 
 <img width="500" alt="JwtAuthorizationFilter" src="https://user-images.githubusercontent.com/26767161/80301701-9aef0080-87e0-11ea-8981-f454127f74ad.PNG">
