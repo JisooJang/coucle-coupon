@@ -17,7 +17,6 @@ import java.util.Optional;
 import java.util.regex.Pattern;
 
 @Slf4j
-@Transactional
 @Service
 public class MemberService {
     private final MemberRepository memberRepository;
@@ -36,6 +35,8 @@ public class MemberService {
                             "And length should be over 8 characters.");
         }
     }
+
+    @Transactional
     public Member signUp(UserModel model) {
         // password 암호화 저장
         // 트랜잭션 레벨 설정
@@ -55,6 +56,7 @@ public class MemberService {
         }
 
     }
+
     public Optional<Member> findById(long id) {
         return memberRepository.findById(id);
     }
