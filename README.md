@@ -16,5 +16,15 @@ h2-database
 
 ## How to Build
 ```
-> gradlew build
+gradlew build
+```
+
+## How to run Spring boot app
+```
+gradlew bootrun
+```
+
+## How to run test
+```
+gradlew test
 ```
