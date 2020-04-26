@@ -133,7 +133,7 @@ gradlew bootrun
 gradlew test
 ```
 
-## API list
+## API specification
 **기본 요청 주소 : `http://localhost:8080/`**
 - signup : 
   - endpoint : `/signup`
