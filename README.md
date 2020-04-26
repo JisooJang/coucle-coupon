@@ -132,3 +132,80 @@ gradlew bootrun
 ```
 gradlew test
 ```
+
+## API list
+**기본 요청 주소 : `http://localhost:8080/`**
+- signup : 
+  - endpoint : `/signup`
+  - method: `POST`
+  - payload: id(string. 3자이상 30자 이하), password(string. 8자 이상의 영어, 숫자, 특수문자 최소 1개씩 포함)
+  - response: 200 OK. 응답 헤더에 `Bearer {JWT}` 토큰을 실어서 전달한다. 응답 바디는 비어있음.
+
+- signin : 
+  - endpoint : `/signin`
+  - method: `POST`
+  - payload: id(string. 3자이상 30자 이하), password(string. 8자 이상의 영어, 숫자, 특수문자 최소 1개씩 포함)
+  - response: 200 OK. 응답 헤더에 `Bearer {JWT}` 토큰을 실어서 전달한다. 응답 바디는 비어있음.
+  
+- 랜덤한 N개 쿠폰 생성 : 
+  - endpoint : `/coupon/{num}`
+  - method: `POST`
+  - request-header: 로그인/가입시 전달받은 JWT를 Authorization Bearer {JWT} 형식으로 전달.
+  - response: 
+    - 201 CREATED
+    - num이 1000을 넘어갈경우 400 BAD-REQUEST
+  
+- 사용자 쿠폰 지급 : 
+  - endpoint : `/coupon/user`
+  - method: `PUT`
+  - request-header: 로그인/가입시 전달받은 JWT를 Authorization Bearer {JWT} 형식으로 전달.
+  - response: 
+    - 200 OK with empty body. 
+    - 사용자가 존재하지 않을경우 404 NOT-FOUND.
+    
+  
+- 사용자 쿠폰 조회 : 
+  - endpoint : `/coupon/user`
+  - method: `GET`
+  - request-header: 로그인/가입시 전달받은 JWT를 Authorization Bearer {JWT} 형식으로 전달.
+  - response: 
+    - 200 OK (body: coupon data). 
+    - 쿠폰이 없을 경우 204 NO-CONTENT.
+  
+  
+- 사용자 쿠폰 사용 : 
+  - endpoint : `/coupon/{coupon_code}`
+  - method: `PUT`
+  - request-header: 로그인/가입시 전달받은 JWT를 Authorization Bearer {JWT} 형식으로 전달.
+  - response: 
+    - 200 OK (body: coupon data). 
+    - 쿠폰번호가 UUID 형식이 아닌경우 400 BAD-REQUEST
+    - 쿠폰번호에 해당하는 쿠폰이 없을 경우 404 NOT-FOUND.
+    - 쿠폰번호에 해당하는 쿠폰이 해당 사용자의 소유가 아니면 403 FORBIDDEN
+    
+- 사용자 쿠폰 사용 취소 : 
+  - endpoint : `/coupon/{coupon_code}/cancel`
+  - method: `PUT`
+  - request-header: 로그인/가입시 전달받은 JWT를 Authorization Bearer {JWT} 형식으로 전달.
+  - response: 
+    - 200 OK (body: coupon data). 
+    - 쿠폰번호가 UUID 형식이 아닌경우 400 BAD-REQUEST
+    - 쿠폰번호에 해당하는 쿠폰이 없을 경우 404 NOT-FOUND.
+    - 쿠폰번호에 해당하는 쿠폰이 해당 사용자의 소유가 아니면 403 FORBIDDEN
+    
+- 당일 만료되는 쿠폰 조회 : 
+  - endpoint : `/coupon/expired`
+  - method: `GET`
+  - request-header: 로그인/가입시 전달받은 JWT를 Authorization Bearer {JWT} 형식으로 전달.
+  - response: 
+    - 200 OK (body: coupon data). 
+    - 당일 만료되는 쿠폰이 없을경우 204 NO_CONTENT
+    
+    
+  
+
+
+
+
+
+
