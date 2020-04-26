@@ -3,6 +3,7 @@ Spring boot REST API 기반의 쿠폰 앱<br>
 Spring security를 이용한 JWT 인증 / 인가를 사용한 유저 관리 
 
 ## Using
+- language : Java 1.8
 - framework : Spring boot 2.2.6 
 - build tool : gradle 6.3
 - dependency :
