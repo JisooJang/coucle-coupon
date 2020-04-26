@@ -1,5 +1,6 @@
 package com.example.mycoupon.controller;
 
+import com.example.mycoupon.exceptions.CouponMemberNotMatchException;
 import com.example.mycoupon.exceptions.IllegalArgumentException;
 import com.example.mycoupon.exceptions.CouponNotFoundException;
 import com.example.mycoupon.exceptions.MemberNotFoundException;
@@ -21,6 +22,11 @@ public class CustomControllerAdvice {
     @ExceptionHandler(value = {CouponNotFoundException.class, MemberNotFoundException.class})
     ResponseEntity<Object> notFoundException(Exception e) {
         return this.error(e, HttpStatus.NOT_FOUND, e.getLocalizedMessage());
+    }
+
+    @ExceptionHandler(value = CouponMemberNotMatchException.class)
+    ResponseEntity<Object> couponMemberNotMatchException(Exception e) {
+        return this.error(e, HttpStatus.FORBIDDEN, e.getLocalizedMessage());
     }
 
     @ExceptionHandler(IllegalArgumentException.class)
