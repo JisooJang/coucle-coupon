@@ -98,7 +98,7 @@ h2-database
 ***
 
 ### Entity 설계 및 연관관계
-- **Conpon - Member (ManyToOne)** 단방향 연관 관계. Coupon entity(Many)에서 Member 필드를 가지도록 설계하였다. 
+- **Coupon - Member (ManyToOne)** 단방향 연관 관계. Coupon entity(Many)에서 Member 필드를 가지도록 설계하였다. 
 - 유저는 쿠폰을 가지고 있을 수도 있고, 하나도 가지고 없을 수도 있다.
 - **Coupon - CouponInfo (OneToOne)** 단방향 연관 관계. Coupon entity에서 CouponInfo 필드를 가지도록 설계하였다.
 - 쿠폰은 반드시 쿠폰 정보를 필수로 가진다.
