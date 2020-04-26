@@ -14,7 +14,6 @@ lombok
 h2-database
 ```
 - test : Junit4, JUnitParams
-- database : 
 
 ## Project structure
 ```
