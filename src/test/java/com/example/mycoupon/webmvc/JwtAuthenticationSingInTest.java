@@ -1,7 +1,6 @@
 package com.example.mycoupon.webmvc;
 
 import com.example.mycoupon.payload.UserModel;
-import com.example.mycoupon.repository.MemberRepository;
 import com.example.mycoupon.service.MemberService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Test;
@@ -23,9 +22,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class JwtAuthenticationSingInTest {
     @Autowired
     private MockMvc mvc;
-
-    @Autowired
-    private MemberRepository memberRepository;
 
     @Autowired
     private MemberService memberService;
