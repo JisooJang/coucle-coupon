@@ -1,5 +1,6 @@
 # mycoupon-jwt-app
-REST API 기반의 JWT 인증 / 인가를 사용하여 유저 관리 및 쿠폰 시스템
+Spring boot REST API 기반의 쿠폰 앱<br>
+Spring security를 이용한 JWT 인증 / 인가를 사용한 유저 관리 
 
 ## Using
 - framework : Spring boot 2.2.6 
