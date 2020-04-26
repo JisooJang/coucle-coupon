@@ -69,7 +69,7 @@ h2-database
 ## Problem Solving
 (class diagram 사용 출처 : https://online.visual-paradigm.com/)
 ### JWT authentication (signup / signin 접근)
-1. signp
+**1. signp**
 <img width="500" alt="JwtAuthenticationSignUpFilter" src="https://user-images.githubusercontent.com/26767161/80301698-8d397b00-87e0-11ea-8651-160b793d6d28.PNG">
 - spring security의 `AbstractAuthenticationProcessingFilter`를 상속받아 유저의 가입(인증) 성공시 JWT를 발급하도록 하였다. <br>
 - `attemptAuthentication` method에서 주입받은 memberservice 빈을 이용해 가입 요청을 처리하고, Authentication 객체를 넘겨준다. <br>
@@ -78,7 +78,7 @@ h2-database
 
 ***
 
-2. signin
+**2. signin**
 <img width="500" alt="JwtAuthenticationSignInFilter" src="https://user-images.githubusercontent.com/26767161/80301668-59f6ec00-87e0-11ea-9d5e-5191e7ea54cd.PNG">
 - spring security의 `UsernamePasswordAuthenticationFilter`를 상속받아 유저의 로그인 인증 성공시 JWT를 발급하도록 하였다. <br> 
 - `attemptAuthentication` method에서 authenticationmanger를 통해 유저의 Authentication 객체를 넘겨준다. <br>
@@ -87,6 +87,9 @@ h2-database
 
 ### JWT authorization 
 <img width="500" alt="JwtAuthorizationFilter" src="https://user-images.githubusercontent.com/26767161/80301701-9aef0080-87e0-11ea-8981-f454127f74ad.PNG">
+- spring security의 `BasicAuthenticationFilter`를 상속받아 /coupon/** API 요청이 들어오면 JWT를 먼저 검사하도록 하였다. <br> 
+- `doFilterInternal` method에서 요청 헤더를 검사하고 토큰이 올바른지 검증 후 인증 성공 처리를 한다. <br>
+- 이 과정에서 인증이 제대로 성공했다면, request에 memberId 정보를 담아 controller 로직을 타도록 한다. <br>
 
 ### Entity 설계 및 연관관계
 
