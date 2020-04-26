@@ -44,9 +44,6 @@ public class CouponControllerTest {
     private MemberService memberService;
 
     @MockBean
-    private MemberRepository memberRepository;
-
-    @MockBean
     private CouponService couponService;
 
     @MockBean
