@@ -91,6 +91,8 @@ h2-database
 - `doFilterInternal` method에서 요청 헤더를 검사하고 토큰이 올바른지 검증 후 인증 성공 처리를 한다. <br>
 - 이 과정에서 인증이 제대로 성공했다면, request에 `memberId` 정보를 담아 Controller 로직을 타도록 한다. <br>
 
+***
+
 ### Entity 설계 및 연관관계
 - **Conpon - Member (ManyToOne)** 단방향 연관 관계. Coupon entity(Many)에서 Member 필드를 가지도록 설계하였다.
 - 유저는 쿠폰을 가지고 있을 수도 있고, 하나도 가지고 없을 수도 있다.
