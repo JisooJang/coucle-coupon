@@ -15,6 +15,7 @@ import java.util.Date;
 @Table(name = "coupon_info")
 public class CouponInfo {
     @Id
+    @Column(name = "coupon_id")
     private long couponId;
 
     @Column(name = "is_used", nullable = false)
