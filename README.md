@@ -116,6 +116,9 @@ h2-database
 - unit test 이외에 security filter 로직을 타야하는 테스트 검증도 필요하다고 판단하여, spring의 `@WebMvcTest`를 이용해
 endpoint로 직접 요청하는 테스트를 추가하였다.
 
+### 쿠폰 만료일 스케줄링 설계
+- Scheduled 기능을 사용하여 `CouponSchedulerService`의 `sendNoticeExpiredAfter3days` 메소드에
+**매일 오후 1시마다** Coupon DB를 조회하여 만료 3일 전의 쿠폰 데이터를 가져오고, 해당 쿠폰의 유저의 회원아이디와 함께 로그를 출력하도록 하였다.
 ## Schema
 ![](https://user-images.githubusercontent.com/26767161/80300710-f964b080-87d9-11ea-978c-9b3738096eb2.PNG)
 (사용 출처 : https://dbdiagram.io/)
