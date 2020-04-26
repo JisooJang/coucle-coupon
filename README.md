@@ -66,6 +66,8 @@ h2-database
             ValidationRegex.java
 ```
 
+## Schema
+![](https://user-images.githubusercontent.com/26767161/80300710-f964b080-87d9-11ea-978c-9b3738096eb2.PNG)
 ## How to Build
 ```
 gradlew build
