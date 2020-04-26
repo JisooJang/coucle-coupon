@@ -1,7 +1,6 @@
-package com.example.mycoupon.member;
+package com.example.mycoupon.service;
 
-import com.example.mycoupon.domain.member.MemberRepository;
-import com.example.mycoupon.domain.member.MemberService;
+import com.example.mycoupon.repository.MemberRepository;
 import com.example.mycoupon.exceptions.IllegalArgumentException;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;

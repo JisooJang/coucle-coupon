@@ -1,6 +1,6 @@
 package com.example.mycoupon.config.security;
 
-import com.example.mycoupon.domain.member.Member;
+import com.example.mycoupon.domain.Member;
 import lombok.Getter;
 import org.springframework.security.core.userdetails.User;
 

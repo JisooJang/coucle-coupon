@@ -1,8 +1,6 @@
-package com.example.mycoupon.domain.coupon;
+package com.example.mycoupon.domain;
 
 import com.example.mycoupon.utils.ValidationRegex;
-import com.example.mycoupon.domain.couponInfo.CouponInfo;
-import com.example.mycoupon.domain.member.Member;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;

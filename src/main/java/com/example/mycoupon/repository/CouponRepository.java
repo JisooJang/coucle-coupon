@@ -1,5 +1,6 @@
-package com.example.mycoupon.domain.coupon;
+package com.example.mycoupon.repository;
 
+import com.example.mycoupon.domain.Coupon;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 

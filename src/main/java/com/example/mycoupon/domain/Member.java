@@ -1,4 +1,4 @@
-package com.example.mycoupon.domain.member;
+package com.example.mycoupon.domain;
 
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;

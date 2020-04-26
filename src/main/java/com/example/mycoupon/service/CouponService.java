@@ -1,11 +1,13 @@
-package com.example.mycoupon.domain.coupon;
+package com.example.mycoupon.service;
 
+import com.example.mycoupon.domain.Coupon;
+import com.example.mycoupon.repository.CouponRepository;
 import com.example.mycoupon.utils.ValidationRegex;
-import com.example.mycoupon.domain.couponInfo.CouponInfo;
-import com.example.mycoupon.domain.member.Member;
+import com.example.mycoupon.domain.CouponInfo;
+import com.example.mycoupon.domain.Member;
 import com.example.mycoupon.exceptions.CouponMemberNotMatchException;
 import com.example.mycoupon.exceptions.CouponNotFoundException;
-import com.example.mycoupon.domain.couponInfo.CouponInfoRepository;
+import com.example.mycoupon.repository.CouponInfoRepository;
 import com.example.mycoupon.exceptions.IllegalArgumentException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

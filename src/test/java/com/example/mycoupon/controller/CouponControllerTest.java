@@ -1,10 +1,10 @@
-package com.example.mycoupon.coupon;
+package com.example.mycoupon.controller;
 
 import com.example.mycoupon.controller.CouponController;
-import com.example.mycoupon.domain.coupon.Coupon;
-import com.example.mycoupon.domain.coupon.CouponService;
-import com.example.mycoupon.domain.member.Member;
-import com.example.mycoupon.domain.member.MemberService;
+import com.example.mycoupon.domain.Coupon;
+import com.example.mycoupon.service.CouponService;
+import com.example.mycoupon.domain.Member;
+import com.example.mycoupon.service.MemberService;
 import com.example.mycoupon.exceptions.MemberNotFoundException;
 import org.junit.Before;
 import org.junit.Test;

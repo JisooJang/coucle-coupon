@@ -1,4 +1,4 @@
-package com.example.mycoupon.domain.couponInfo;
+package com.example.mycoupon.domain;
 
 import lombok.*;
 import org.hibernate.annotations.UpdateTimestamp;

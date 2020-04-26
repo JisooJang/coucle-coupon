@@ -1,11 +1,8 @@
-package com.example.mycoupon.coupon;
+package com.example.mycoupon.repository;
 
-import com.example.mycoupon.domain.coupon.Coupon;
-import com.example.mycoupon.domain.coupon.CouponRepository;
-import com.example.mycoupon.domain.couponInfo.CouponInfo;
-import com.example.mycoupon.domain.member.Member;
-import org.junit.Before;
-import org.junit.BeforeClass;
+import com.example.mycoupon.domain.Coupon;
+import com.example.mycoupon.domain.CouponInfo;
+import com.example.mycoupon.domain.Member;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,7 +13,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import javax.validation.ConstraintViolationException;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;

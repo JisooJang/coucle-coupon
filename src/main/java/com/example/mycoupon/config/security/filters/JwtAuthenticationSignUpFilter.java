@@ -7,7 +7,7 @@ import com.example.mycoupon.exceptions.SignUpFailedException;
 import com.example.mycoupon.payload.UserModel;
 import com.example.mycoupon.config.security.JWTSecurityConstants;
 import com.example.mycoupon.config.security.SecurityMember;
-import com.example.mycoupon.domain.member.MemberService;
+import com.example.mycoupon.service.MemberService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -17,7 +17,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
-import org.springframework.web.server.ResponseStatusException;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;

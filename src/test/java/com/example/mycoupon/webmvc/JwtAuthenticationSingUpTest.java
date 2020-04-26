@@ -2,7 +2,7 @@ package com.example.mycoupon.webmvc;
 
 import com.example.mycoupon.config.security.CustomUserDetailsService;
 import com.example.mycoupon.controller.CouponController;
-import com.example.mycoupon.domain.member.MemberService;
+import com.example.mycoupon.service.MemberService;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.OverrideAutoConfiguration;

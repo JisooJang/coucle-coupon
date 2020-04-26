@@ -12,8 +12,6 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.Optional;
-
 @ControllerAdvice(annotations = RestController.class)
 public class CustomControllerAdvice {
     private final MediaType vndErrorMediaType =

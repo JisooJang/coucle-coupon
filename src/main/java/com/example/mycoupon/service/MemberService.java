@@ -1,5 +1,7 @@
-package com.example.mycoupon.domain.member;
+package com.example.mycoupon.service;
 
+import com.example.mycoupon.domain.Member;
+import com.example.mycoupon.repository.MemberRepository;
 import com.example.mycoupon.utils.ValidationRegex;
 import com.example.mycoupon.exceptions.IllegalArgumentException;
 import com.example.mycoupon.payload.UserModel;

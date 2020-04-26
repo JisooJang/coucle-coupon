@@ -1,7 +1,6 @@
-package com.example.mycoupon.member;
+package com.example.mycoupon.repository;
 
-import com.example.mycoupon.domain.member.Member;
-import com.example.mycoupon.domain.member.MemberRepository;
+import com.example.mycoupon.domain.Member;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
