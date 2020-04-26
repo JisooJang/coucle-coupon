@@ -94,10 +94,22 @@ h2-database
 ***
 
 ### Entity 설계 및 연관관계
-- **Conpon - Member (ManyToOne)** 단방향 연관 관계. Coupon entity(Many)에서 Member 필드를 가지도록 설계하였다.
+- **Conpon - Member (ManyToOne)** 단방향 연관 관계. Coupon entity(Many)에서 Member 필드를 가지도록 설계하였다. 
 - 유저는 쿠폰을 가지고 있을 수도 있고, 하나도 가지고 없을 수도 있다.
 - **Coupon - CouponInfo (OneToOne)** 단방향 연관 관계. Coupon entity에서 CouponInfo 필드를 가지도록 설계하였다.
 - 쿠폰은 반드시 쿠폰 정보를 필수로 가진다.
+
+### API 설계
+- 각 API 요구사항에 필요한 DB 쿼리들을 `repository`에서 구현하였다. 
+- 각 `service`에서 필요한 repository의 메소드를 호출하도록 설계하였다. 
+- service에서는 repository를 호출하기 전에, 필요한 경우 `validation`을 수행하여 통과하지 못하면 400대 에러를 리턴하도록 설계하였다.
+- `controller`에서는 내용의 존재여부, 에러 발생 여부에 따라 알맞은 status_code와 Coupon 데이터를 리턴한다.
+
+### Test 설계
+- repository, service, controller 별로 의존 관계에 있는 빈들을 `Mock`하여 unit test 코드를 작성하였다.
+- unit test 이외에 security filter 로직을 타야하는 테스트 검증도 필요하다고 판단하여, spring의 `@WebMvcTest`를 이용해
+endpoint로 직접 요청하는 테스트를 추가하였다.
+
 ## Schema
 ![](https://user-images.githubusercontent.com/26767161/80300710-f964b080-87d9-11ea-978c-9b3738096eb2.PNG)
 (사용 출처 : https://dbdiagram.io/)
