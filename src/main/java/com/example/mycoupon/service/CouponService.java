@@ -11,8 +11,9 @@ import com.example.mycoupon.repository.CouponInfoRepository;
 import com.example.mycoupon.exceptions.IllegalArgumentException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Transactional;
 
-import javax.transaction.Transactional;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -54,13 +55,11 @@ public class CouponService {
     }
 
     public void bulkSave(int n) {
-        // TODO: save() n번 반복? 멀티 쓰레딩?
         for(int i=0 ; i<n ; i++) {
             save(null);
         }
     }
 
-    // TODO: 트랜잭션 격리 레벨 설정
     @Transactional
     public Coupon save(Member member) {
         /* member 매개변수는 null로 넘어올 수 있다. (유저에게 할당하기 전에 쿠폰을 생성할 때) */
@@ -87,7 +86,9 @@ public class CouponService {
         return couponResult;
     }
 
-    @Transactional
+    // REPEATABLE_READ
+    // SELECT 문장이 사용하는 모든 데이터에 shared lock이 걸리므로 다른 사용자는 그 영역에 해당되는 데이터에 대한 수정이 불가
+    @Transactional(isolation = Isolation.REPEATABLE_READ)
     public String assignToUser(Member member) {
         // TODO: 트랜잭션 레벨 고려 (쿠폰을 멤버에 할당하는 도중, 다른 트랜잭션에서 이 쿠폰에 접근하거나 유저를 할당하면 안됨.)
         Coupon coupon = couponRepository.findByFreeUser();
@@ -104,7 +105,6 @@ public class CouponService {
 
     @Transactional
     public void updateIsEnabledCouponById(String code, long memberId, boolean isUsed) throws CouponNotFoundException {
-        // TODO : transaction 레벨 설정
         Coupon coupon = couponRepository.findByCode(code);
         if(coupon == null) {
             throw new CouponNotFoundException(code);
@@ -115,10 +115,12 @@ public class CouponService {
         coupon.getCouponInfo().setUsed(isUsed);
     }
 
+    @Transactional(readOnly = true)
     public List<Coupon> findExpiredToday() {
         return couponRepository.findByExpiredToday();
     }
 
+    @Transactional(readOnly = true)
     public List<Coupon> findByMember(long memberId) {
         return couponRepository.findByMemberId(memberId);
     }
