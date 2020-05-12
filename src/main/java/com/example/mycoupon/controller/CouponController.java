@@ -3,6 +3,7 @@ package com.example.mycoupon.controller;
 import com.example.mycoupon.domain.Coupon;
 import com.example.mycoupon.domain.Member;
 import com.example.mycoupon.exceptions.CouponNotFoundException;
+import com.example.mycoupon.exceptions.InvalidPayloadException;
 import com.example.mycoupon.service.CouponService;
 import com.example.mycoupon.service.MemberService;
 import com.example.mycoupon.exceptions.MemberNotFoundException;
@@ -35,7 +36,7 @@ public class CouponController {
     @PostMapping("/{num}")
     public ResponseEntity<?> saveCoupon(@PathVariable("num") int num, @RequestAttribute long memberId) {
         if(num > 1000) {
-            return ResponseEntity.badRequest().build();
+            throw new InvalidPayloadException("The number of coupon should be less than 1000.");
         }
         couponservice.bulkSave(num);
 

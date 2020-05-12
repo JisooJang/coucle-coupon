@@ -4,12 +4,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
 @ResponseStatus(value = HttpStatus.BAD_REQUEST)
-public class IllegalArgumentException extends RuntimeException {
-    public IllegalArgumentException(String message) {
+public class InvalidPayloadException extends RuntimeException {
+    public InvalidPayloadException(String message) {
         super(message);
     }
 
-    public IllegalArgumentException(String message, Throwable cause) {
+    public InvalidPayloadException(String message, Throwable cause) {
         super(message, cause);
     }
 }

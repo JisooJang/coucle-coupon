@@ -1,7 +1,7 @@
 package com.example.mycoupon.service;
 
+import com.example.mycoupon.exceptions.InvalidPayloadException;
 import com.example.mycoupon.repository.MemberRepository;
-import com.example.mycoupon.exceptions.IllegalArgumentException;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import org.junit.Before;
@@ -31,7 +31,7 @@ public class MemberServicePasswordValidationTest {
         memberService.validationPassword(password);
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test(expected = InvalidPayloadException.class)
     @Parameters({
             "qwer1234", "11234!!", "qqq223wwr", "test12344", "!@wqqwrRR"
     })

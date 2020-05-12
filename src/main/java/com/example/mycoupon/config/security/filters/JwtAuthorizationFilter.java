@@ -65,7 +65,7 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
                         .verify(token.replace(JWTSecurityConstants.TOKEN_PREFIX, ""))
                         //.getSubject();
                         .getAudience().get(0);
-            } catch(JWTDecodeException | InvalidClaimException e) {
+            } catch(JWTDecodeException | InvalidClaimException e) { // JWTVerificationException 로 통합 (두개 다 JWTVerificationException를 상속받은 exception)
                 throw new InvalidTokenException(e, HttpStatus.UNAUTHORIZED.value());
             }
 

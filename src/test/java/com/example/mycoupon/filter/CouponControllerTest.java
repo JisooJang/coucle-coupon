@@ -5,13 +5,13 @@ import com.auth0.jwt.algorithms.Algorithm;
 import com.example.mycoupon.config.security.JWTSecurityConstants;
 import com.example.mycoupon.controller.CouponController;
 import com.example.mycoupon.domain.Coupon;
+import com.example.mycoupon.exceptions.InvalidPayloadException;
 import com.example.mycoupon.repository.CouponRepository;
 import com.example.mycoupon.service.CouponService;
 import com.example.mycoupon.domain.Member;
 import com.example.mycoupon.service.MemberService;
 import com.example.mycoupon.exceptions.CouponMemberNotMatchException;
 import com.example.mycoupon.exceptions.CouponNotFoundException;
-import com.example.mycoupon.exceptions.IllegalArgumentException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -88,6 +88,15 @@ public class CouponControllerTest {
                 .header("Authorization", "Bearer " + getJWT())
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isCreated());
+    }
+
+    @Test
+    public void CouponCreateFailureByOverLimit() throws Exception {
+        mvc.perform(MockMvcRequestBuilders
+                .post("/coupon/5000")
+                .header("Authorization", "Bearer " + getJWT())
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
     }
 
     @Test
@@ -208,7 +217,7 @@ public class CouponControllerTest {
     public void CouponPutUseFailureInvalidCode() throws Exception {
         String fakeCode = "fakeCouponCode";
 
-        doThrow(new IllegalArgumentException("Invalid format of coupon code."))
+        doThrow(new InvalidPayloadException("Invalid format of coupon code."))
                 .when(couponService).validateCouponCode(fakeCode);
         mvc.perform(MockMvcRequestBuilders
                 .put("/coupon/" + fakeCode)

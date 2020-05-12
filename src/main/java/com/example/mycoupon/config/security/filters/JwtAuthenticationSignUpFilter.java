@@ -2,7 +2,7 @@ package com.example.mycoupon.config.security.filters;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
-import com.example.mycoupon.exceptions.IllegalArgumentException;
+import com.example.mycoupon.exceptions.InvalidPayloadException;
 import com.example.mycoupon.exceptions.SignUpFailedException;
 import com.example.mycoupon.payload.UserModel;
 import com.example.mycoupon.config.security.JWTSecurityConstants;
@@ -52,7 +52,7 @@ public class JwtAuthenticationSignUpFilter extends AbstractAuthenticationProcess
         // save Member DB
         try {
             memberService.signUp(model);
-        } catch(IllegalArgumentException e) {
+        } catch(InvalidPayloadException e) {
             throw new SignUpFailedException(e.getLocalizedMessage(), e);
         }
 
@@ -100,7 +100,7 @@ public class JwtAuthenticationSignUpFilter extends AbstractAuthenticationProcess
         if(failed instanceof SignUpFailedException) {
             statusCode = HttpStatus.BAD_REQUEST.value();
         } else {
-            statusCode = HttpStatus.FORBIDDEN.value();
+            statusCode = HttpStatus.UNAUTHORIZED.value();
         }
 
         response.setStatus(statusCode);

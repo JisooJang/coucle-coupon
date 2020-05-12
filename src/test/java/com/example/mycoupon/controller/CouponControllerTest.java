@@ -2,6 +2,7 @@ package com.example.mycoupon.controller;
 
 import com.example.mycoupon.controller.CouponController;
 import com.example.mycoupon.domain.Coupon;
+import com.example.mycoupon.exceptions.InvalidPayloadException;
 import com.example.mycoupon.service.CouponService;
 import com.example.mycoupon.domain.Member;
 import com.example.mycoupon.service.MemberService;
@@ -54,7 +55,7 @@ public class CouponControllerTest {
         assertThat(result.getStatusCode()).isEqualTo(HttpStatus.CREATED);
     }
 
-    @Test
+    @Test(expected = InvalidPayloadException.class)
     public void saveCouponOverLimit() throws Exception {
         long memberId = 1L;
         ResponseEntity<?> result = couponController.saveCoupon(1001, memberId);

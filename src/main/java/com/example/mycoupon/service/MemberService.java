@@ -1,9 +1,9 @@
 package com.example.mycoupon.service;
 
 import com.example.mycoupon.domain.Member;
+import com.example.mycoupon.exceptions.InvalidPayloadException;
 import com.example.mycoupon.repository.MemberRepository;
 import com.example.mycoupon.utils.ValidationRegex;
-import com.example.mycoupon.exceptions.IllegalArgumentException;
 import com.example.mycoupon.payload.UserModel;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,7 +29,7 @@ public class MemberService {
 
     public void validationPassword(String password) {
         if(!Pattern.matches(ValidationRegex.PASSWORD, password)) {
-            throw new IllegalArgumentException(
+            throw new InvalidPayloadException(
                     "password should be use alphabet, number, special-character at least 1 time each." +
                             "And length should be over 8 characters.");
         }
@@ -40,7 +40,7 @@ public class MemberService {
         // password 암호화 저장
         // 트랜잭션 레벨 설정
         if(memberRepository.findByMediaId(model.getId()) != null) {
-            throw new IllegalArgumentException("user id already exists.");
+            throw new InvalidPayloadException("user id already exists.");
         }
         validationPassword(model.getPassword());
         Member member = new Member(model.getId(), model.getPassword());
@@ -48,7 +48,7 @@ public class MemberService {
         try {
             return memberRepository.save(member);
         } catch(ConstraintViolationException ex) {
-            throw new IllegalArgumentException("Invalid arguments.");
+            throw new InvalidPayloadException("Invalid arguments.");
         }
 
     }

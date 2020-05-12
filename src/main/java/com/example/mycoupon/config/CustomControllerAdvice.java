@@ -1,8 +1,8 @@
 package com.example.mycoupon.config;
 
 import com.example.mycoupon.exceptions.CouponMemberNotMatchException;
-import com.example.mycoupon.exceptions.IllegalArgumentException;
 import com.example.mycoupon.exceptions.CouponNotFoundException;
+import com.example.mycoupon.exceptions.InvalidPayloadException;
 import com.example.mycoupon.exceptions.MemberNotFoundException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -27,8 +27,8 @@ public class CustomControllerAdvice {
         return this.error(e, HttpStatus.FORBIDDEN, e.getLocalizedMessage());
     }
 
-    @ExceptionHandler(IllegalArgumentException.class)
-    ResponseEntity<Object> illegalArgementException(IllegalArgumentException e) {
+    @ExceptionHandler(InvalidPayloadException.class)
+    ResponseEntity<Object> invalidPayloadException(InvalidPayloadException e) {
         return this.error(e, HttpStatus.BAD_REQUEST, e.getLocalizedMessage());
     }
 
