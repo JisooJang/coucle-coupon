@@ -17,6 +17,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import java.time.LocalDateTime;
 import java.util.*;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -38,7 +39,7 @@ public class CouponServiceTest {
 
     @Before
     public void prepare() {
-        this.couponService = new CouponService(couponRepository, couponInfoRepository, Calendar.getInstance());
+        this.couponService = new CouponService(couponRepository, couponInfoRepository);
     }
 
     @Test
@@ -87,7 +88,7 @@ public class CouponServiceTest {
     @Test(expected = CouponMemberNotMatchException.class)
     public void updateIsEnabledCouponByIdMemberNotMatch() {
         String testCode = "test1234";
-        Date tmpDate = new Date();
+        LocalDateTime tmpDate = LocalDateTime.now();
         Member m = Member.builder().mediaId("testtest").password("test1234!!").build();
         m.setId(2L);
 

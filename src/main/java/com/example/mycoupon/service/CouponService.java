@@ -14,8 +14,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Calendar;
-import java.util.Date;
+import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.UUID;
 import java.util.regex.Pattern;
@@ -26,14 +26,10 @@ public class CouponService {
 
     private final CouponInfoRepository couponInfoRepository;
 
-    private final Calendar calendar;
-
     @Autowired
-    public CouponService(CouponRepository couponRepository, CouponInfoRepository couponInfoRepository,
-                         Calendar calendar) {
+    public CouponService(CouponRepository couponRepository, CouponInfoRepository couponInfoRepository) {
         this.couponRepository = couponRepository;
         this.couponInfoRepository = couponInfoRepository;
-        this.calendar = calendar;
     }
 
     public void validateCouponCode(String code) throws InvalidPayloadException {
@@ -47,11 +43,9 @@ public class CouponService {
         return UUID.randomUUID().toString();
     }
 
-    public Date getRandomExpiredAt(Date fromDate) {
+    public LocalDateTime getRandomExpiredAt(LocalDateTime fromDate) {
         // add random expired days from now date (1 day ~ 7 days)
-        calendar.setTime(fromDate);
-        calendar.add(Calendar.DATE, (int)(Math.random() * 7) + 1);
-        return calendar.getTime();
+        return fromDate.plusDays((long)(Math.random() * 7) + 1);
     }
 
     public void bulkSave(int n) {
@@ -66,7 +60,7 @@ public class CouponService {
     public Coupon save(Member member) {
         /* member 매개변수는 null로 넘어올 수 있다. (유저에게 할당하기 전에 쿠폰을 생성할 때) */
         Coupon coupon;
-        Date nowDate = new Date();
+        LocalDateTime nowDateLocal = LocalDateTime.now();
         if(member == null) {
             coupon = Coupon.builder()
                     .code(getUUIDCouponCode())
@@ -74,8 +68,8 @@ public class CouponService {
         } else {
             coupon = Coupon.builder()
                     .code(getUUIDCouponCode())
-                    .assignedAt(nowDate)
-                    .expiredAt(getRandomExpiredAt(nowDate))
+                    .assignedAt(nowDateLocal)
+                    .expiredAt(getRandomExpiredAt(nowDateLocal))
                     .member(member)
                     .build();
         }
@@ -97,7 +91,8 @@ public class CouponService {
         if(coupon == null) {
             coupon = save(member);
         } else {
-            Date assignedAt = new Date();
+            LocalDateTime assignedAt = LocalDateTime.now();
+
             coupon.setMember(member);  // update SQL
             coupon.setAssignedAt(assignedAt);
             coupon.setExpiredAt(getRandomExpiredAt(assignedAt));

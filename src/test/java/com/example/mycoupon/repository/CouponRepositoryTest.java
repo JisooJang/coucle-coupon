@@ -13,6 +13,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import javax.validation.ConstraintViolationException;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -97,7 +99,7 @@ public class CouponRepositoryTest {
     public void findByExpiredToday() throws Exception {
         Coupon coupon = Coupon.builder()
                 .code(UUID.randomUUID().toString())
-                .expiredAt(new Date())
+                .expiredAt(LocalDateTime.now())
                 .build();
         coupon = this.entityManager.persist(coupon);
 
@@ -126,14 +128,10 @@ public class CouponRepositoryTest {
 
     @Test
     public void findByExpiredAfter3Days() throws Exception {
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTime(new Date());
-        calendar.add(Calendar.DATE, 3);
-
         for(int i=0 ; i<2 ; i++) {
             Coupon coupon = Coupon.builder()
                     .code(UUID.randomUUID().toString())
-                    .expiredAt(calendar.getTime())
+                    .expiredAt(LocalDateTime.now().plusDays(3))
                     .build();
             this.entityManager.persist(coupon);
         }
@@ -147,7 +145,7 @@ public class CouponRepositoryTest {
         for(int i=0 ; i<2 ; i++) {
             Coupon coupon = Coupon.builder()
                     .code(UUID.randomUUID().toString())
-                    .expiredAt(new Date())
+                    .expiredAt(LocalDateTime.now())
                     .build();
             this.entityManager.persist(coupon);
         }
