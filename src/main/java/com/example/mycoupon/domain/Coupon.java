@@ -7,7 +7,7 @@ import org.hibernate.annotations.CreationTimestamp;
 
 import javax.persistence.*;
 import javax.validation.constraints.Pattern;
-import java.util.Date;
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
@@ -32,13 +32,13 @@ public class Coupon {
 
     @Column(name = "created_at", nullable = false, updatable = false)
     @CreationTimestamp
-    private Date createdAt;
+    private LocalDateTime createdAt;
 
     @Column(name = "expired_at")
-    private Date expiredAt;
+    private LocalDateTime expiredAt;
 
     @Column(name = "assigned_at")
-    private Date assignedAt;
+    private LocalDateTime assignedAt;
 
     @JsonIgnore
     @ManyToOne
