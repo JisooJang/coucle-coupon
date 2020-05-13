@@ -1,6 +1,5 @@
 package com.example.mycoupon.controller;
 
-import com.example.mycoupon.controller.CouponController;
 import com.example.mycoupon.domain.Coupon;
 import com.example.mycoupon.exceptions.InvalidPayloadException;
 import com.example.mycoupon.service.CouponService;
@@ -9,11 +8,9 @@ import com.example.mycoupon.service.MemberService;
 import com.example.mycoupon.exceptions.MemberNotFoundException;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mock.web.MockHttpServletRequest;
@@ -30,7 +27,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
 
 @RunWith(SpringRunner.class)
-@ExtendWith(MockitoExtension.class)
 public class CouponControllerTest {
     @Mock
     private CouponService couponService;
