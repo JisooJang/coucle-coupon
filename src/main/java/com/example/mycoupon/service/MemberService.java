@@ -9,8 +9,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import javax.transaction.Transactional;
 import javax.validation.ConstraintViolationException;
 import java.util.Optional;
 import java.util.regex.Pattern;
@@ -53,6 +53,7 @@ public class MemberService {
 
     }
 
+    @Transactional(readOnly = true)
     public Optional<Member> findById(long id) {
         return memberRepository.findById(id);
     }
