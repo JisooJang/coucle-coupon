@@ -1,5 +1,6 @@
 package com.example.mycoupon.service;
 
+import com.example.mycoupon.aop.LogExecutionTime;
 import com.example.mycoupon.domain.Coupon;
 import com.example.mycoupon.exceptions.InvalidPayloadException;
 import com.example.mycoupon.repository.CouponRepository;
@@ -15,7 +16,6 @@ import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.UUID;
 import java.util.regex.Pattern;
@@ -84,6 +84,7 @@ public class CouponService {
 
     // REPEATABLE_READ
     // SELECT 문장이 사용하는 모든 데이터에 shared lock이 걸리므로 다른 사용자는 그 영역에 해당되는 데이터에 대한 수정이 불가
+    @LogExecutionTime
     @Transactional(isolation = Isolation.REPEATABLE_READ)
     public String assignToUser(Member member) {
         // TODO: 트랜잭션 레벨 고려 (쿠폰을 멤버에 할당하는 도중, 다른 트랜잭션에서 이 쿠폰에 접근하거나 유저를 할당하면 안됨.)
