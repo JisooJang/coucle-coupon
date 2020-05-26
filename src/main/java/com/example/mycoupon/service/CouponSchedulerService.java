@@ -4,6 +4,7 @@ import com.example.mycoupon.domain.Coupon;
 import com.example.mycoupon.repository.CouponRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
@@ -20,11 +21,17 @@ public class CouponSchedulerService {
     }
 
     // 매일 오후 1시에 실행
+    // 비동기 실행
+    @Async
     @Scheduled(cron = "0 0 13 * * ?")
     public void sendNoticeExpiredAfter3days() {
         List<Coupon> expiredList = couponRepository.findByExpiredAfter3Days();
+
+        // send message to each user.
         for(Coupon coupon : expiredList) {
             log.info("Your coupon expires in 3 days. userId : " + coupon.getMember().getMediaId());
         }
     }
+
+
 }
