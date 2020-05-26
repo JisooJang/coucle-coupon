@@ -2,9 +2,7 @@ package com.example.mycoupon.service;
 
 import com.example.mycoupon.domain.Coupon;
 import com.example.mycoupon.domain.Member;
-import com.example.mycoupon.repository.CouponInfoRepository;
 import com.example.mycoupon.repository.CouponRepository;
-import org.hibernate.validator.constraints.ModCheck;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -27,7 +25,7 @@ public class CouponSchedulerServiceTest {
 
     @Before
     public void prepare() {
-        this.schedulerService = new CouponSchedulerService(couponRepository);
+        this.schedulerService = new CouponSchedulerService(couponRepository, new NotiService());
     }
     @Test
     public void sendNoticeExpiredAfter3days() {

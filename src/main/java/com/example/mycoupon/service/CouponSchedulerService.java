@@ -14,24 +14,23 @@ import java.util.List;
 @Service
 public class CouponSchedulerService {
     private final CouponRepository couponRepository;
+    private final NotiService notiService;
 
     @Autowired
-    public CouponSchedulerService(CouponRepository repository) {
+    public CouponSchedulerService(CouponRepository repository, NotiService notiService) {
         this.couponRepository = repository;
+        this.notiService = notiService;
     }
 
     // 매일 오후 1시에 실행
-    // 비동기 실행
-    @Async
     @Scheduled(cron = "0 0 13 * * ?")
     public void sendNoticeExpiredAfter3days() {
         List<Coupon> expiredList = couponRepository.findByExpiredAfter3Days();
 
         // send message to each user.
         for(Coupon coupon : expiredList) {
-            log.info("Your coupon expires in 3 days. userId : " + coupon.getMember().getMediaId());
+            notiService.sendNoticeToUser(coupon.getMember().getMediaId()); // 비동기 실행
         }
+
     }
-
-
 }

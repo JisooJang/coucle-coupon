@@ -93,7 +93,6 @@ public class CouponService {
             coupon = save(member);
         } else {
             LocalDateTime assignedAt = LocalDateTime.now();
-
             coupon.setMember(member);  // update SQL
             coupon.setAssignedAt(assignedAt);
             coupon.setExpiredAt(getRandomExpiredAt(assignedAt));
