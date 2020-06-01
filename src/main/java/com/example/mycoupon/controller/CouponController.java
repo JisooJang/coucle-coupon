@@ -1,5 +1,6 @@
 package com.example.mycoupon.controller;
 
+import com.example.mycoupon.aop.LogExecutionTime;
 import com.example.mycoupon.domain.Coupon;
 import com.example.mycoupon.domain.Member;
 import com.example.mycoupon.exceptions.CouponNotFoundException;
@@ -12,9 +13,14 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import javax.xml.ws.Response;
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.Callable;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 
 /*
 JwyAuthorizationFilter 로직을 컨트롤러 진입 전에 먼저 타서 헤더의 토큰이 유효한 지 검사 후 ->
@@ -32,12 +38,15 @@ public class CouponController {
         this.memberService = memberService;
     }
 
+    @LogExecutionTime
     @PostMapping("/{num}")
-    public ResponseEntity<?> saveCoupon(@PathVariable("num") int num, @RequestAttribute long memberId) {
+    public ResponseEntity<?> saveCoupon(@PathVariable("num") int num, @RequestAttribute long memberId) throws InterruptedException {
         if(num > 1000) {
-            throw new InvalidPayloadException("The number of coupon should be less than 1000.");
+            throw new InvalidPayloadException("The number of coupon should be less than 1000000.");
         }
-        couponservice.bulkSave(num);
+        for(int i=0 ; i<num ; i++) {
+            couponservice.save(null);
+        }
 
         URI selfLink = URI.create(
                 ServletUriComponentsBuilder.fromCurrentRequest().toUriString()
@@ -45,11 +54,39 @@ public class CouponController {
         return ResponseEntity.created(selfLink).build();
     }
 
+    @LogExecutionTime
+    @PostMapping("/{num}/async")
+    public Callable<ResponseEntity<?>> saveCouponAsync(@PathVariable("num") int num, @RequestAttribute long memberId) throws InterruptedException {
+        if(num > 1000) {
+            throw new InvalidPayloadException("The number of coupon should be less than 1000000.");
+        }
+        for(int i=0 ; i<num ; i++) {
+            couponservice.save(null);
+        }
+
+        URI selfLink = URI.create(
+                ServletUriComponentsBuilder.fromCurrentRequest().toUriString()
+        );
+        return () -> ResponseEntity.created(selfLink).build();
+    }
+
     @PutMapping("/user")
-    public ResponseEntity<String> assignToUserCoupon(@RequestAttribute("memberId") long memberId) throws MemberNotFoundException { // user_id는 JwtAuthorizationFilter에서 넘겨줌.
+    public ResponseEntity<String> assignToUserCoupon(@RequestAttribute("memberId") long memberId) throws MemberNotFoundException, ExecutionException, InterruptedException { // user_id는 JwtAuthorizationFilter에서 넘겨줌.
         Optional<Member> member = memberService.findById(memberId);
         if(member.isPresent()) {
-            return ResponseEntity.ok(couponservice.assignToUser(member.get()));
+            String couponCode = couponservice.assignToUser(member.get());
+            return ResponseEntity.ok().body(couponCode);
+        } else {
+            throw new MemberNotFoundException(memberId);
+        }
+    }
+
+    @PutMapping("/user/async")
+    public ResponseEntity<String> assignToUserCouponAsync(@RequestAttribute("memberId") long memberId) throws MemberNotFoundException, ExecutionException, InterruptedException { // user_id는 JwtAuthorizationFilter에서 넘겨줌.
+        Optional<Member> member = memberService.findById(memberId);
+        if(member.isPresent()) {
+            String couponCode = couponservice.assignToUserAsync(member.get());
+            return ResponseEntity.ok().body(couponCode);
         } else {
             throw new MemberNotFoundException(memberId);
         }
