@@ -10,6 +10,7 @@ import com.example.mycoupon.domain.Member;
 import com.example.mycoupon.exceptions.CouponMemberNotMatchException;
 import com.example.mycoupon.exceptions.CouponNotFoundException;
 import com.example.mycoupon.repository.CouponInfoRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
@@ -18,8 +19,11 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 import java.util.regex.Pattern;
 
+@Slf4j
 @Service
 public class CouponService {
     private final CouponRepository couponRepository;
@@ -48,12 +52,6 @@ public class CouponService {
         return fromDate.plusDays((long)(Math.random() * 7) + 1);
     }
 
-    public void bulkSave(int n) {
-        for(int i=0 ; i<n ; i++) {
-            save(null);
-        }
-    }
-
     // 트랜잭션 전파 유형 : PROPAGATION_REQUIRED (기본값)
     // 이미 존재하는 부모 트랜잭션이 있다면 부모 트랜잭션 내에서 실행되고, 부모 트랜잭션이 없다면 새 트랜잭션이 시작된다.
     @Transactional
@@ -78,7 +76,6 @@ public class CouponService {
         CouponInfo couponInfo = CouponInfo.builder().couponId(couponResult.getId()).isUsed(false).build();
 
         couponInfoRepository.save(couponInfo);
-
         return couponResult;
     }
 
@@ -86,7 +83,29 @@ public class CouponService {
     // SELECT 문장이 사용하는 모든 데이터에 shared lock이 걸리므로 다른 사용자는 그 영역에 해당되는 데이터에 대한 수정이 불가
     @LogExecutionTime
     @Transactional(isolation = Isolation.REPEATABLE_READ)
-    public String assignToUser(Member member) {
+    public String assignToUserAsync(Member member) throws ExecutionException, InterruptedException {
+        CompletableFuture<String> future = CompletableFuture.supplyAsync(() -> {
+            Coupon coupon = couponRepository.findByFreeUser();
+            if(coupon == null) {
+                coupon = save(member);
+            } else {
+                LocalDateTime assignedAt = LocalDateTime.now();
+                coupon.setMember(member);  // update SQL
+                coupon.setAssignedAt(assignedAt);
+                coupon.setExpiredAt(getRandomExpiredAt(assignedAt));
+            }
+            return coupon.getCode();
+        }).exceptionally((ex) -> {
+            ex.printStackTrace();
+            return null;
+        });
+        log.info("current Thread name : " + Thread.currentThread().getName());
+        return future.get();
+    }
+
+    @LogExecutionTime
+    @Transactional(isolation = Isolation.REPEATABLE_READ)
+    public String assignToUser(Member member) throws InterruptedException {
         // TODO: 트랜잭션 레벨 고려 (쿠폰을 멤버에 할당하는 도중, 다른 트랜잭션에서 이 쿠폰에 접근하거나 유저를 할당하면 안됨.)
         Coupon coupon = couponRepository.findByFreeUser();
         if(coupon == null) {
@@ -97,6 +116,8 @@ public class CouponService {
             coupon.setAssignedAt(assignedAt);
             coupon.setExpiredAt(getRandomExpiredAt(assignedAt));
         }
+
+        log.info("current Thread name : " + Thread.currentThread().getName());
         return coupon.getCode();
     }
 
