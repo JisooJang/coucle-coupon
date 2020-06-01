@@ -12,14 +12,15 @@ import org.springframework.stereotype.Component;
 @Slf4j
 public class AopAspect {
     // define pointcut and advice
-    @Around(value="@annotation(LogExecutionTime) && args(member)", argNames = "member")
-    public Object LogExecutionTime(ProceedingJoinPoint joinPoint, Member member) throws Throwable {
+    //@Around(value="@annotation(LogExecutionTime) && args(member)", argNames = "member")
+    @Around(value="@annotation(LogExecutionTime)")
+    public Object LogExecutionTime(ProceedingJoinPoint joinPoint) throws Throwable {
         long startTime = System.currentTimeMillis();
         Object proceed = joinPoint.proceed(); // method return value
         long executionTime = System.currentTimeMillis() - startTime;
 
         log.info(joinPoint.getSignature() + " executed in " + executionTime);
-        log.info("ID: " + member.getMediaId() + " assigned to coupon(" + proceed + ")");
+        //log.info("ID: " + member.getMediaId() + " assigned to coupon(" + proceed + ")");
         return proceed;
     }
 }
