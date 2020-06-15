@@ -79,10 +79,8 @@ public class CouponService {
         return couponResult;
     }
 
-    // REPEATABLE_READ
-    // SELECT 문장이 사용하는 모든 데이터에 shared lock이 걸리므로 다른 사용자는 그 영역에 해당되는 데이터에 대한 수정이 불가
     @LogExecutionTime
-    @Transactional(isolation = Isolation.REPEATABLE_READ)
+    @Transactional
     public String assignToUserAsync(Member member) throws ExecutionException, InterruptedException {
         CompletableFuture<String> future = CompletableFuture.supplyAsync(() -> {
             Coupon coupon = couponRepository.findByFreeUser();
@@ -104,9 +102,9 @@ public class CouponService {
     }
 
     @LogExecutionTime
-    @Transactional(isolation = Isolation.REPEATABLE_READ)
+    @Transactional
     public String assignToUser(Member member) throws InterruptedException {
-        // TODO: 트랜잭션 레벨 고려 (쿠폰을 멤버에 할당하는 도중, 다른 트랜잭션에서 이 쿠폰에 접근하거나 유저를 할당하면 안됨.)
+        // TODO: 트랜잭션 레벨 고려(versioning 추가)
         Coupon coupon = couponRepository.findByFreeUser();
         if(coupon == null) {
             coupon = save(member);
