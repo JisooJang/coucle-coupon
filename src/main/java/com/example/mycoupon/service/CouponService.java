@@ -119,6 +119,10 @@ public class CouponService {
         return coupon.getCode();
     }
 
+    public String testTransactionalProxy(Member m) throws InterruptedException {
+        return assignToUser(m);
+    }
+
     @Transactional
     public void updateIsEnabledCouponById(String code, long memberId, boolean isUsed) throws CouponNotFoundException {
         Coupon coupon = couponRepository.findByCode(code);

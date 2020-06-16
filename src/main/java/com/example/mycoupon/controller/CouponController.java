@@ -75,6 +75,7 @@ public class CouponController {
         Optional<Member> member = memberService.findById(memberId);
         if(member.isPresent()) {
             String couponCode = couponservice.assignToUser(member.get());
+            //String couponCode = couponservice.testTransactionalProxy(member.get()); // @Transactional 프록시 inner-method call을 위해 테스트
             return ResponseEntity.ok().body(couponCode);
         } else {
             throw new MemberNotFoundException(memberId);

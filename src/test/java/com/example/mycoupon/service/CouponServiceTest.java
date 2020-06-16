@@ -65,7 +65,7 @@ public class CouponServiceTest {
     }
 
     @Test
-    public void assignToUser() {
+    public void assignToUser() throws InterruptedException {
         given(this.couponRepository.findByFreeUser()).willReturn(
                 Coupon.builder().code("1234").build());
 
@@ -134,5 +134,18 @@ public class CouponServiceTest {
                         Coupon.builder().code("test1234").build()));
         List<Coupon> result = couponService.findExpiredToday();
         assertThat(result.size()).isEqualTo(1);
+    }
+
+    @Test
+    public void testTransactionalProxyInnerMethodCall() throws InterruptedException {
+        Member m = Member.builder()
+                .mediaId("test1234")
+                .password(passwordEncoder.encode("test1234!"))
+                .build();
+        Coupon coupon = Coupon.builder().code(UUID.randomUUID().toString()).build();
+        given(couponRepository.findByFreeUser()).willReturn(coupon);
+
+        String memberId = couponService.testTransactionalProxy(m);
+        System.out.println(memberId);
     }
 }
