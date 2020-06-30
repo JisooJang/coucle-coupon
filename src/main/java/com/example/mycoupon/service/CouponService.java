@@ -81,6 +81,7 @@ public class CouponService {
         return couponResult;
     }
 
+    @CacheEvict(value="coupon-list", key="#member.id")
     @LogExecutionTime
     @Transactional
     public String assignToUserAsync(Member member) throws ExecutionException, InterruptedException {
@@ -122,9 +123,9 @@ public class CouponService {
         return coupon.getCode();
     }
 
-    public String testTransactionalProxy(Member m) throws InterruptedException {
-        return assignToUser(m);
-    }
+//    public String testTransactionalProxy(Member m) throws InterruptedException {
+//        return assignToUser(m);
+//    }
 
     @Transactional
     public void updateIsEnabledCouponById(String code, long memberId, boolean isUsed) throws CouponNotFoundException {
