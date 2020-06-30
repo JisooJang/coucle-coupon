@@ -7,6 +7,7 @@ import org.hibernate.annotations.CreationTimestamp;
 
 import javax.persistence.*;
 import javax.validation.constraints.Pattern;
+import java.io.Serializable;
 import java.time.LocalDateTime;
 
 @Getter
@@ -19,7 +20,7 @@ import java.time.LocalDateTime;
         name = "coupon",
         indexes = {@Index(name = "coupon_expired_at_index", columnList = "expired_at", unique = false)}
 )
-public class Coupon {
+public class Coupon implements Serializable {
     // 각 필드 validation 상세 annotation 추가할 것. (size, blank 등)
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

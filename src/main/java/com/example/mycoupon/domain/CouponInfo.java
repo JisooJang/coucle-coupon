@@ -4,6 +4,7 @@ import lombok.*;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.time.LocalDateTime;
 
 @Getter
@@ -13,7 +14,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Entity
 @Table(name = "coupon_info")
-public class CouponInfo {
+public class CouponInfo implements Serializable {
     @Id
     @Column(name = "coupon_id")
     private long couponId;

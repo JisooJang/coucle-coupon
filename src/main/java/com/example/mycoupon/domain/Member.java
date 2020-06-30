@@ -6,6 +6,7 @@ import org.hibernate.annotations.CreationTimestamp;
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
+import java.io.Serializable;
 import java.time.LocalDateTime;
 
 @Getter
@@ -14,7 +15,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Entity
 @Table(name = "member")
-public class Member {
+public class Member implements Serializable {
     // 각 필드 validation 상세 annotation 추가할 것. (size, blank 등)
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
