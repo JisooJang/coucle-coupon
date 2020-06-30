@@ -12,6 +12,8 @@ import com.example.mycoupon.exceptions.CouponNotFoundException;
 import com.example.mycoupon.repository.CouponInfoRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
@@ -101,10 +103,11 @@ public class CouponService {
         return future.get();
     }
 
+    @CacheEvict(value="coupon-list", key="#member.id")
     @LogExecutionTime
     @Transactional
     public String assignToUser(Member member) throws InterruptedException {
-        // TODO: 트랜잭션 레벨 고려(versioning 추가)
+        // TODO: 트랜잭션 레벨 고려 (Coupon entity에 versioning 추가)
         Coupon coupon = couponRepository.findByFreeUser();
         if(coupon == null) {
             coupon = save(member);
@@ -140,8 +143,10 @@ public class CouponService {
         return couponRepository.findByExpiredToday();
     }
 
+    @Cacheable(value="coupon-list", key="#memberId")
     @Transactional(readOnly = true)
     public List<Coupon> findByMember(long memberId) {
+        System.out.println("메소드 호출");
         return couponRepository.findByMemberId(memberId);
     }
 }
