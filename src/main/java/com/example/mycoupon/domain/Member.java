@@ -1,5 +1,6 @@
 package com.example.mycoupon.domain;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 
@@ -11,7 +12,7 @@ import java.time.LocalDateTime;
 
 @Getter
 @Setter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor
 @AllArgsConstructor
 @Entity
 @Table(name = "member")
@@ -31,6 +32,7 @@ public class Member implements Serializable {
     @Column(name = "password", nullable = false, length = 100)
     private String password;
 
+    @JsonFormat(pattern = "yyyy-MM-dd kk:mm:ss")
     @Column(name = "created_at", nullable = false, updatable = false)
     @CreationTimestamp
     private LocalDateTime createdAt;
