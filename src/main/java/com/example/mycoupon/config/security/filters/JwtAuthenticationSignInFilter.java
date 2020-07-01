@@ -2,6 +2,7 @@ package com.example.mycoupon.config.security.filters;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
+import com.example.mycoupon.exceptions.SignInFailedException;
 import com.example.mycoupon.payload.UserModel;
 import com.example.mycoupon.config.security.JWTSecurityConstants;
 import com.example.mycoupon.config.security.SecurityMember;
@@ -39,7 +40,7 @@ public class JwtAuthenticationSignInFilter extends UsernamePasswordAuthenticatio
             model = new ObjectMapper().readValue(req.getInputStream(), UserModel.class);
         } catch (IOException e) {
             e.printStackTrace();
-            throw new RuntimeException(e);
+            throw new SignInFailedException("Unable to mapping payload data tp UserModel data class.", e);
         }
 
         // Authenticate user
