@@ -8,15 +8,15 @@ import java.util.List;
 
 public interface CouponRepository extends JpaRepository<Coupon, Long> {
     @Query(value = "SELECT * from coupon WHERE member_id IS NULL LIMIT 1", nativeQuery = true)
-    public Coupon findByFreeUser();
+    Coupon findByFreeUser();
 
     @Query(value = "SELECT * from coupon WHERE FORMATDATETIME(EXPIRED_AT, 'yyyy-MM-dd') = CURRENT_DATE()", nativeQuery = true)
-    public List<Coupon> findByExpiredToday();
+    List<Coupon> findByExpiredToday();
 
-    public Coupon findByCode(String code);
+    Coupon findByCode(String code);
 
-    public List<Coupon> findByMemberId(long memberId);
+    List<Coupon> findByMemberId(long memberId);
 
     @Query(value = "SELECT * from coupon WHERE FORMATDATETIME(EXPIRED_AT, 'yyyy-MM-dd') = DATEADD(DAY, 3, CURRENT_DATE())", nativeQuery = true)
-    public List<Coupon> findByExpiredAfter3Days();
+    List<Coupon> findByExpiredAfter3Days();
 }
