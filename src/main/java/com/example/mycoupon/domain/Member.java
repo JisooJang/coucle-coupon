@@ -32,14 +32,20 @@ public class Member implements Serializable {
     @Column(name = "password", nullable = false, length = 100)
     private String password;
 
+    @Size(min = 10, max = 11)
+    @NotBlank
+    @Column(name = "phone_number", nullable = false, length = 11)
+    private String phoneNumber;
+
     @JsonFormat(pattern = "yyyy-MM-dd kk:mm:ss")
     @Column(name = "created_at", nullable = false, updatable = false)
     @CreationTimestamp
     private LocalDateTime createdAt;
 
     @Builder
-    public Member(String mediaId, String password) {
+    public Member(String mediaId, String password, String phoneNumber) {
         this.mediaId = mediaId;
         this.password = password;
+        this.phoneNumber = phoneNumber;
     }
 }

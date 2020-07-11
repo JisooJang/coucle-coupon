@@ -43,8 +43,11 @@ public class MemberService {
             throw new InvalidPayloadException("user id already exists.");
         }
         validationPassword(model.getPassword());
-        Member member = new Member(model.getId(), model.getPassword());
-        member.setPassword(passwordEncoder.encode(member.getPassword()));
+        Member member = Member.builder()
+                .mediaId(model.getId())
+                .phoneNumber(model.getPhone_number())
+                .password(passwordEncoder.encode(model.getPassword()))
+                .build();
         try {
             return memberRepository.save(member);
         } catch(ConstraintViolationException ex) {

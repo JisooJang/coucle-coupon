@@ -8,4 +8,5 @@ import lombok.Setter;
 public class UserModel {
     private String id;
     private String password;
+    private String phone_number;
 }
