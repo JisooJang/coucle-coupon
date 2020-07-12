@@ -10,9 +10,16 @@ Spring security를 이용한 JWT 인증 / 인가를 사용한 유저 관리
 ```
 Spring boot data JPA
 Spring boot starter security
+spring-boot-starter-aop
+spring-boot-starter-data-redis
+spring-kafka
 java-jwt
 lombok
 h2-database
+
+spring-cloud-starter-netflix-eureka-client
+spring-cloud-starter-openfeign
+...
 ```
 - test : Junit4, JUnitParams, Mockito
 
