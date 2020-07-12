@@ -1,7 +1,9 @@
 package com.example.mycoupon.service;
 
 import com.example.mycoupon.domain.Coupon;
+import com.example.mycoupon.domain.Member;
 import com.example.mycoupon.repository.CouponRepository;
+import com.example.mycoupon.template.AlarmTalk;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
@@ -29,8 +31,12 @@ public class CouponSchedulerService {
 
         // send message to each user.
         for(Coupon coupon : expiredList) {
-            notiService.sendNoticeToUser(coupon.getMember().getMediaId()); // 비동기 실행
+            Member member = coupon.getMember();
+            AlarmTalk alarmTalk = AlarmTalk.builder()
+                    .mediaId(member.getMediaId())
+                    .phoneNumber(member.getPhoneNumber())
+                    .build();
+            notiService.sendAlarmTalkToUser(alarmTalk); // TODO : 비동기 실행
         }
-
     }
 }
