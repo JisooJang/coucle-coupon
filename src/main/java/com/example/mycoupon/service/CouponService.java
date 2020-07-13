@@ -148,6 +148,6 @@ public class CouponService {
     @Transactional(readOnly = true)
     public List<Coupon> findByMember(long memberId) {
         System.out.println("메소드 호출");
-        return couponRepository.findByMemberId(memberId);
+        return couponRepository.findByMemberNotUsed(memberId);
     }
 }
