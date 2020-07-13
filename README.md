@@ -1,6 +1,7 @@
 # mycoupon-jwt-app
 Spring boot REST API 기반의 쿠폰 앱<br>
-Spring security를 이용한 JWT 인증 / 인가를 사용한 유저 관리 
+`Spring security`를 이용한 JWT 인증 / 인가를 사용한 유저 관리<br>
+Scheduler를 이용한 쿠폰 만료 유저 알림 처리 (`kafka` 사용)
 
 ## Using
 - language : Java 1.8
