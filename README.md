@@ -154,7 +154,7 @@ endpoint로 직접 요청하는 테스트를 추가하였다.
 ### 쿠폰 만료일 스케줄링 설계
 - Scheduled 기능을 사용하여 `CouponSchedulerService`의 `sendNoticeExpiredAfter3days` 메소드에
 **매일 오후 1시마다** `CouponRepository`의 메소드를 통해 Coupon DB를 조회하여 만료 3일 전의 쿠폰 데이터를 가져오고, 해당 쿠폰의 유저의 회원아이디와 함께 로그를 출력하도록 하였다.
-- Apache Kafka를 사용하여 `alarmtalk.notification` topic으로 유저 이름과 연락처 데이터를 담은 메시지를 produce한다.
+- **Apache Kafka**를 사용하여 `alarmtalk.notification` topic으로 유저 이름과 연락처 데이터를 담은 메시지를 produce한다.
 - `coucle-notification` 서비스에서 위의 topic으로 전달된 메시지를 consume하여 적절한 알림 기능을 동작시킨다.
 (https://github.com/JisooJang/coucle-notification/blob/master/src/main/java/com/example/notification/listener/AlarmTalkListener.java)
 
