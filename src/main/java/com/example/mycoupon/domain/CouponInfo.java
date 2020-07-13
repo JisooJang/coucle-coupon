@@ -32,7 +32,4 @@ public class CouponInfo implements Serializable {
     @Column(name = "last_updated_time")
     @UpdateTimestamp
     private LocalDateTime lastUpdatedTime;   // 초기엔 null값 셋팅. isEnabled 필드값이 바뀌면 업데이트 됨.
-
-    public void setUsed(boolean isUsed) {
-    }
 }

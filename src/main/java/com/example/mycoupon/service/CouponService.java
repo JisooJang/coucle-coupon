@@ -136,7 +136,7 @@ public class CouponService {
         if(coupon.getMember().getId() != memberId) {
             throw new CouponMemberNotMatchException(code);
         }
-        coupon.getCouponInfo().setUsed(isUsed);
+        coupon.getCouponInfo().setIsUsed(isUsed);
     }
 
     @Transactional(readOnly = true)
