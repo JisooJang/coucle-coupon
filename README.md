@@ -202,8 +202,8 @@ gradlew test
 ```
 
 ## API specification
-**기본 요청 주소 : `http://localhost:8080/`** <br>
-**H2 DB client host : `http://localhost:8080/h2-console`** 
+**기본 요청 주소 : `http://localhost:8083/`** <br>
+**H2 DB client host : `http://localhost:8083/h2-console`** 
 
 - signup : 
   - endpoint : `/signup`
