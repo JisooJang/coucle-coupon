@@ -25,55 +25,77 @@ spring-cloud-starter-openfeign
 
 ## Project structure
 ```
--mycoupon
-    |   MycouponApplication.java
-    |
-    +---config
-    |   |   AppConfig.java
-    |   |   CustomControllerAdvice.java
-    |   |   SecurityConfig.java
-    |   |
-    |   \---security
-    |       |   CustomUserDetailsService.java
-    |       |   JWTSecurityConstants.java
-    |       |   SecurityMember.java
-    |       |
-    |       \---filters
-    |               JwtAuthenticationSignInFilter.java
-    |               JwtAuthenticationSignUpFilter.java
-    |               JwtAuthorizationFilter.java
-    |
-    +---controller
-    |       CouponController.java
-    |
-    +---domain
-    |       Coupon.java
-    |       CouponInfo.java
-    |       Member.java
-    |
-    +---exceptions
-    |       CouponMemberNotMatchException.java
-    |       CouponNotFoundException.java
-    |       IllegalArgumentException.java
-    |       InvalidTokenException.java
-    |       MemberNotFoundException.java
-    |       SignUpFailedException.java
-    |
-    +---payload
-    |       UserModel.java
-    |
-    +---repository
-    |       CouponInfoRepository.java
-    |       CouponRepository.java
-    |       MemberRepository.java
-    |
-    +---service
-    |       CouponSchedulerService.java
-    |       CouponService.java
-    |       MemberService.java
-    |
-    \---utils
-            ValidationRegex.java
+└─src
+    ├─main
+    │  ├─java
+    │  │  └─com
+    │  │      └─example
+    │  │          └─mycoupon
+    │  │              │  MycouponApplication.java
+    │  │              │
+    │  │              ├─aop
+    │  │              │      AopAspect.java
+    │  │              │      LogExecutionTime.java
+    │  │              │
+    │  │              ├─config
+    │  │              │  │  AppConfig.java
+    │  │              │  │  CustomControllerAdvice.java
+    │  │              │  │  EmbeddedRedisConfig.java
+    │  │              │  │  KafkaConfig.java
+    │  │              │  │  RedisCacheConfig.java
+    │  │              │  │  SecurityConfig.java
+    │  │              │  │
+    │  │              │  └─security
+    │  │              │      │  CustomUserDetailsService.java
+    │  │              │      │  JWTSecurityConstants.java
+    │  │              │      │  SecurityMember.java
+    │  │              │      │
+    │  │              │      └─filters
+    │  │              │              CustomAuthenticationEntryPoint.java
+    │  │              │              JwtAuthenticationSignInFilter.java
+    │  │              │              JwtAuthenticationSignUpFilter.java
+    │  │              │              JwtAuthorizationFilter.java
+    │  │              │
+    │  │              ├─controller
+    │  │              │      CouponController.java
+    │  │              │
+    │  │              ├─domain
+    │  │              │      Coupon.java
+    │  │              │      CouponInfo.java
+    │  │              │      Member.java
+    │  │              │
+    │  │              ├─exceptions
+    │  │              │      CouponMemberNotMatchException.java
+    │  │              │      CouponNotFoundException.java
+    │  │              │      InvalidPayloadException.java
+    │  │              │      InvalidTokenException.java
+    │  │              │      MemberNotFoundException.java
+    │  │              │      SignInFailedException.java
+    │  │              │      SignUpFailedException.java
+    │  │              │
+    │  │              ├─payload
+    │  │              │      UserModel.java
+    │  │              │
+    │  │              ├─repository
+    │  │              │      CouponInfoRepository.java
+    │  │              │      CouponRepository.java
+    │  │              │      MemberRepository.java
+    │  │              │
+    │  │              ├─service
+    │  │              │      CouponSchedulerService.java
+    │  │              │      CouponService.java
+    │  │              │      MemberService.java
+    │  │              │      NotiService.java
+    │  │              │
+    │  │              ├─template
+    │  │              │      AlarmTalk.java
+    │  │              │
+    │  │              └─utils
+    │  │                      ValidationRegex.java
+    │  │
+    │  └─resources
+    │      │  application.properties
+    │      │  bootstrap.properties
 ```
 
 ## Problem Solving
