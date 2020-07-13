@@ -26,7 +26,7 @@ public class Coupon implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
-    private long id;
+    private Long id;
 
     @Pattern(regexp = ValidationRegex.COUPONCODE)
     @Column(name = "code", nullable = false, unique = true, updatable = false)

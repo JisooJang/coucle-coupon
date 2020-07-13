@@ -18,10 +18,10 @@ import java.time.LocalDateTime;
 public class CouponInfo implements Serializable {
     @Id
     @Column(name = "coupon_id")
-    private long couponId;
+    private Long couponId;
 
     @Column(name = "is_used", nullable = false)
-    private boolean isUsed;  // 자주 값이 변경될 수 있는 컬럼이라 테이블을 분리함.
+    private Boolean isUsed;  // 자주 값이 변경될 수 있는 컬럼이라 테이블을 분리함.
 
     @JsonFormat(pattern = "yyyy-MM-dd kk:mm:ss")
     @Column(name = "last_updated_time")
