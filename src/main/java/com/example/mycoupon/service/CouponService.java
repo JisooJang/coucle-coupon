@@ -147,7 +147,7 @@ public class CouponService {
     @Cacheable(value="coupon-list", key="#memberId")
     @Transactional(readOnly = true)
     public List<Coupon> findByMember(long memberId) {
-        System.out.println("메소드 호출");
+        log.info("@Cacheable findByMember method called.");
         return couponRepository.findByMemberNotUsed(memberId);
     }
 }
