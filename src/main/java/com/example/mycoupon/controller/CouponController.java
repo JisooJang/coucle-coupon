@@ -45,7 +45,7 @@ public class CouponController {
             throw new InvalidPayloadException("The number of coupon should be less than 1000000.");
         }
         for(int i=0 ; i<num ; i++) {
-            couponservice.save(null);
+            couponservice.save();
         }
 
         URI selfLink = URI.create(
@@ -61,7 +61,7 @@ public class CouponController {
             throw new InvalidPayloadException("The number of coupon should be less than 1000000.");
         }
         for(int i=0 ; i<num ; i++) {
-            couponservice.save(null);
+            couponservice.save();
         }
 
         URI selfLink = URI.create(
@@ -86,8 +86,8 @@ public class CouponController {
     public ResponseEntity<String> assignToUserCouponAsync(@RequestAttribute("memberId") long memberId) throws MemberNotFoundException, ExecutionException, InterruptedException { // user_id는 JwtAuthorizationFilter에서 넘겨줌.
         Optional<Member> member = memberService.findById(memberId);
         if(member.isPresent()) {
-            String couponCode = couponservice.assignToUserAsync(member.get());
-            return ResponseEntity.ok().body(couponCode);
+            CompletableFuture<String> futureResult = couponservice.assignToUserAsync(member.get());
+            return ResponseEntity.ok().body(futureResult.get());
         } else {
             throw new MemberNotFoundException(memberId);
         }
