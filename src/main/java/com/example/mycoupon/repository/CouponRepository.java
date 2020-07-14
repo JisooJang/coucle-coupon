@@ -6,10 +6,11 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface CouponRepository extends JpaRepository<Coupon, Long> {
     @Query(value = "SELECT * from coupon WHERE member_id IS NULL LIMIT 1", nativeQuery = true)
-    Coupon findByFreeUser();
+    Optional<Coupon> findByFreeUser();
 
     @Query(value = "SELECT * from coupon WHERE FORMATDATETIME(EXPIRED_AT, 'yyyy-MM-dd') = CURRENT_DATE()", nativeQuery = true)
     List<Coupon> findByExpiredToday();
