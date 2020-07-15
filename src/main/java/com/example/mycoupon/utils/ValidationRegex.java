@@ -5,4 +5,8 @@ public class ValidationRegex {
     public static final String PASSWORD = "^(?=.*[A-Za-z])(?=.*\\d)(?=.*[$@$!%*#?&])[A-Za-z\\d$@$!%*#?&]{8,}$";
     // UUID format
     public static final String COUPONCODE = "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$";
+
+    public ValidationRegex() throws Exception {
+        throw new Exception("you should not construct this class! use static properties instead.");
+    }
 }
