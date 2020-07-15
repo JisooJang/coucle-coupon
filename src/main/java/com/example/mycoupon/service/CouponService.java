@@ -58,20 +58,22 @@ public class CouponService {
     // 트랜잭션 전파 유형 : PROPAGATION_REQUIRED (기본값)
     // 이미 존재하는 부모 트랜잭션이 있다면 부모 트랜잭션 내에서 실행되고, 부모 트랜잭션이 없다면 새 트랜잭션이 시작된다.
     @Transactional
-    public Coupon save() {
-        LocalDateTime nowDateLocal = LocalDateTime.now();
-        Coupon coupon = Coupon.builder()
-                .code(getUUIDCouponCode())
-                .build();
+    public CompletableFuture<Coupon> save() {
+        return CompletableFuture.supplyAsync(() -> {
+            LocalDateTime nowDateLocal = LocalDateTime.now();
+            Coupon coupon = Coupon.builder()
+                    .code(getUUIDCouponCode())
+                    .build();
 
-        Coupon couponResult = couponRepository.save(coupon);
-        CouponInfo couponInfo = CouponInfo.builder()
-                .couponId(couponResult.getId())
-                .isUsed(false)
-                .build();
+            Coupon couponResult = couponRepository.save(coupon);
+            CouponInfo couponInfo = CouponInfo.builder()
+                    .couponId(couponResult.getId())
+                    .isUsed(false)
+                    .build();
 
-        couponInfoRepository.save(couponInfo);
-        return couponResult;
+            couponInfoRepository.save(couponInfo);
+            return couponResult;
+        });
     }
 
     @Transactional
@@ -98,10 +100,13 @@ public class CouponService {
     @LogExecutionTime
     @Transactional
     public CompletableFuture<String> assignToUserAsync(Member member) throws ExecutionException, InterruptedException {
-        CompletableFuture<String> future = CompletableFuture.supplyAsync(() -> {
+        return CompletableFuture.supplyAsync(() -> {
+            log.info("current Thread name : " + Thread.currentThread().getName());
+
             Optional<Coupon> coupon = couponRepository.findByFreeUser();
             Coupon couponResult;
             if(!coupon.isPresent()) {
+                // FIXME : inner method call -> saveByMember 메서드는 transactional 적용 안됨!
                 couponResult = saveByMember(member);
             } else {
                 couponResult = coupon.get();
@@ -116,30 +121,6 @@ public class CouponService {
             // TODO: change definite exception class.
             throw new RuntimeException(ex.getLocalizedMessage());
         });
-        log.info("current Thread name : " + Thread.currentThread().getName());
-        return future;
-    }
-
-    @CacheEvict(value="coupon-list", key="#member.id")
-    @LogExecutionTime
-    @Transactional
-    public String assignToUser(Member member) throws InterruptedException {
-        Optional<Coupon> coupon = couponRepository.findByFreeUser();
-        Coupon couponResult;
-        if(!coupon.isPresent()) {
-            couponResult = saveByMember(member);
-        } else {
-            couponResult = coupon.get();
-            LocalDateTime assignedAt = LocalDateTime.now();
-            couponResult.setMember(member);  // update SQL
-            couponResult.setAssignedAt(assignedAt);
-            couponResult.setExpiredAt(getRandomExpiredAt(assignedAt));
-        }
-        return couponResult.getCode();
-    }
-
-    public String testTransactionalProxy(Member m) throws InterruptedException {
-        return assignToUser(m);
     }
 
     @Transactional
