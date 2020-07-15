@@ -137,13 +137,17 @@ spring-cloud-starter-openfeign
 - 쿠폰은 반드시 쿠폰 정보를 필수로 가진다.
 
 ### API 설계
-- 각 API 요구사항에 필요한 DB 쿼리들을 `repository`에서 구현하였다. 
-- 각 `service`에서 필요한 repository의 메소드를 호출하도록 설계하였다. 
-- service에서는 repository를 호출하기 전에, 필요한 경우 `validation`을 수행하여 통과하지 못하면 400대 에러를 리턴하도록 설계하였다.
-- `controller`에서는 내용의 존재여부, 에러 발생 여부에 따라 알맞은 status_code와 Coupon 데이터를 리턴한다.
-- `CouponService`에서 사용하지 않은 유저의 쿠폰 정보를 받아올 때는 `@Cacheable`를 사용하려 캐싱 처리, 유저 쿠폰 사용이 update될 때는 `@CacheEvict`를 사용하여 캐싱 처리. 
-- **save coupon**
+- **전체 구조**
+    - 각 API 요구사항에 필요한 DB 쿼리들을 `repository`에서 구현하였다. 
+    - 각 `service`에서 필요한 repository의 메소드를 호출하도록 설계하였다. 
+    - service에서는 repository를 호출하기 전에, 필요한 경우 `validation`을 수행하여 통과하지 못하면 400대 에러를 리턴하도록 설계하였다.
+    - `controller`에서는 내용의 존재여부, 에러 발생 여부에 따라 알맞은 status_code와 Coupon 데이터를 리턴한다.
+- **save coupon (BATCH)**
     - `Couponservice.save` method는 @Async를 사용하여 비동기로 처리시키고, save method를 호출하는 Controller에서는, 만들 쿠폰 갯수만큼 save 메서드를 CompletableFuture.allOf 메서드를 이용하여 각 저장하는 메서드를 병렬로 처리시킴.
+- **assign coupon to user**
+- **update-IsEnabled-Coupon**
+- **find user's coupon**
+  - `CouponService`에서 사용 가능한 유저의 쿠폰 정보를 받아올 때는 `@Cacheable`를 사용하려 캐싱 처리, 유저 쿠폰 사용이 update될 때는 `@CacheEvict`를 사용하여 캐싱 처리. 
 ### Test 설계
 테스트 구조는 아래와 같다.
 ```
