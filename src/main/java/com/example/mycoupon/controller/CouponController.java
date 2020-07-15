@@ -7,6 +7,7 @@ import com.example.mycoupon.exceptions.InvalidPayloadException;
 import com.example.mycoupon.service.CouponService;
 import com.example.mycoupon.service.MemberService;
 import com.example.mycoupon.exceptions.MemberNotFoundException;
+import com.example.mycoupon.utils.CouponUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -82,7 +83,8 @@ public class CouponController {
                                        @RequestParam("is_used") Boolean isUsed,
                                        @RequestAttribute("memberId") long memberId) throws CouponNotFoundException {
 
-        couponservice.validateCouponCode(couponCode);
+        log.info("updateIsEnabledCouponById controller current Thread name : " + Thread.currentThread().getName());
+        CouponUtils.validateCouponCode(couponCode);
         couponservice.updateIsEnabledCouponById(couponCode, memberId, isUsed);
         return ResponseEntity.ok().build();
     }

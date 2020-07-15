@@ -41,12 +41,6 @@ public class CouponService {
         this.couponUpdateService = couponUpdateService;
     }
 
-    public void validateCouponCode(String code) throws InvalidPayloadException {
-        if(!Pattern.matches(ValidationRegex.COUPONCODE, code)) {
-            throw new InvalidPayloadException("Invalid format of coupon code.");
-        }
-    }
-
     // 트랜잭션 전파 유형 : PROPAGATION_REQUIRED (기본값)
     // 이미 존재하는 부모 트랜잭션이 있다면 부모 트랜잭션 내에서 실행되고, 부모 트랜잭션이 없다면 새 트랜잭션이 시작된다.
     // FIXME : @Async, @Transactional 둘다 AOP 사용하여 적용 안됨? -> 로그보면 적용됨
@@ -92,8 +86,10 @@ public class CouponService {
         });
     }
 
+    @Async
     @Transactional
     public void updateIsEnabledCouponById(String code, long memberId, boolean isUsed) throws CouponNotFoundException {
+        log.info("updateIsEnabledCouponById service current Thread name : " + Thread.currentThread().getName());
         Coupon coupon = couponRepository.findByCode(code);
         if(coupon == null) {
             throw new CouponNotFoundException(code);

@@ -1,7 +1,10 @@
 package com.example.mycoupon.utils;
 
+import com.example.mycoupon.exceptions.InvalidPayloadException;
+
 import java.time.LocalDateTime;
 import java.util.UUID;
+import java.util.regex.Pattern;
 
 public class CouponUtils {
     public CouponUtils() throws Exception {
@@ -16,5 +19,11 @@ public class CouponUtils {
     public static LocalDateTime getRandomExpiredAt(LocalDateTime fromDate) {
         // add random expired days from now date (1 day ~ 7 days)
         return fromDate.plusDays((long)(Math.random() * 7) + 1);
+    }
+
+    public static void validateCouponCode(String code) throws InvalidPayloadException {
+        if(!Pattern.matches(ValidationRegex.COUPONCODE, code)) {
+            throw new InvalidPayloadException("Invalid format of coupon code.");
+        }
     }
 }
