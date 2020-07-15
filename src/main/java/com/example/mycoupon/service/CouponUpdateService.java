@@ -51,6 +51,8 @@ public class CouponUpdateService {
         coupon.setMember(member);  // update SQL
         coupon.setAssignedAt(assignedAt);
         coupon.setExpiredAt(CouponUtils.getRandomExpiredAt(assignedAt));
+
+        couponRepository.save(coupon);
         return coupon;
     }
 }

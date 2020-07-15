@@ -17,13 +17,11 @@ import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.regex.Pattern;
@@ -33,12 +31,14 @@ import java.util.regex.Pattern;
 public class CouponService {
     private final CouponRepository couponRepository;
     private final CouponInfoRepository couponInfoRepository;
+    private final CouponUpdateService couponUpdateService;
 
     @Autowired
     public CouponService(CouponRepository couponRepository,
-                         CouponInfoRepository couponInfoRepository) {
+                         CouponInfoRepository couponInfoRepository, CouponUpdateService couponUpdateService) {
         this.couponRepository = couponRepository;
         this.couponInfoRepository = couponInfoRepository;
+        this.couponUpdateService = couponUpdateService;
     }
 
     public void validateCouponCode(String code) throws InvalidPayloadException {
@@ -49,7 +49,7 @@ public class CouponService {
 
     // 트랜잭션 전파 유형 : PROPAGATION_REQUIRED (기본값)
     // 이미 존재하는 부모 트랜잭션이 있다면 부모 트랜잭션 내에서 실행되고, 부모 트랜잭션이 없다면 새 트랜잭션이 시작된다.
-    // FIXME : @Async, @Transactional 둘다 AOP 사용하여 적용 안됨.
+    // FIXME : @Async, @Transactional 둘다 AOP 사용하여 적용 안됨? -> 로그보면 적용됨
     @Async
     @Transactional
     public CompletableFuture<Coupon> save() {
@@ -70,37 +70,6 @@ public class CouponService {
         });
     }
 
-    // FIXME : @Async annotation 메서드에서 콜되므로 @Transactional 적용 안됨.
-    @Transactional
-    public Coupon saveNewCouponByMember(Member member) {
-        LocalDateTime nowDateLocal = LocalDateTime.now();
-        Coupon coupon = Coupon.builder()
-                .code(CouponUtils.getUUIDCouponCode())
-                .assignedAt(nowDateLocal)
-                .expiredAt(CouponUtils.getRandomExpiredAt(nowDateLocal))
-                .member(member)
-                .build();
-
-        Coupon couponResult = couponRepository.save(coupon);
-        CouponInfo couponInfo = CouponInfo.builder()
-                .couponId(couponResult.getId())
-                .isUsed(false)
-                .build();
-
-        couponInfoRepository.save(couponInfo);
-        return couponResult;
-    }
-
-    // TODO CHECK : JPA Persistence context의 변경 감지 기능 동작해야 함.
-    @Transactional // using AOP
-    public Coupon updateCouponByMember(Coupon coupon, Member member) {
-        LocalDateTime assignedAt = LocalDateTime.now();
-        coupon.setMember(member);  // update SQL
-        coupon.setAssignedAt(assignedAt);
-        coupon.setExpiredAt(CouponUtils.getRandomExpiredAt(assignedAt));
-        return coupon;
-    }
-
     @Async // @Async annotation using AOP
     @CacheEvict(value="coupon-list", key="#member.id")
     @LogExecutionTime
@@ -111,9 +80,9 @@ public class CouponService {
             Optional<Coupon> coupon = couponRepository.findByFreeUser();
             Coupon couponResult;
             if(!coupon.isPresent()) {
-                couponResult = saveNewCouponByMember(member);
+                couponResult = couponUpdateService.saveNewCouponByMember(member);
             } else {
-                couponResult = updateCouponByMember(coupon.get(), member);
+                couponResult = couponUpdateService.updateCouponByMember(coupon.get(), member);
             }
             return couponResult.getCode();
         }).exceptionally((ex) -> {
