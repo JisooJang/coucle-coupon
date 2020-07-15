@@ -5,12 +5,12 @@ import com.example.mycoupon.domain.CouponInfo;
 import com.example.mycoupon.domain.Member;
 import com.example.mycoupon.repository.CouponInfoRepository;
 import com.example.mycoupon.repository.CouponRepository;
+import com.example.mycoupon.utils.CouponUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.UUID;
 
 @Service
 public class CouponUpdateService {
@@ -28,9 +28,9 @@ public class CouponUpdateService {
     public Coupon saveNewCouponByMember(Member member) {
         LocalDateTime nowDateLocal = LocalDateTime.now();
         Coupon coupon = Coupon.builder()
-                .code(getUUIDCouponCode())
+                .code(CouponUtils.getUUIDCouponCode())
                 .assignedAt(nowDateLocal)
-                .expiredAt(getRandomExpiredAt(nowDateLocal))
+                .expiredAt(CouponUtils.getRandomExpiredAt(nowDateLocal))
                 .member(member)
                 .build();
 
@@ -50,15 +50,7 @@ public class CouponUpdateService {
         LocalDateTime assignedAt = LocalDateTime.now();
         coupon.setMember(member);  // update SQL
         coupon.setAssignedAt(assignedAt);
-        coupon.setExpiredAt(getRandomExpiredAt(assignedAt));
+        coupon.setExpiredAt(CouponUtils.getRandomExpiredAt(assignedAt));
         return coupon;
-    }
-
-    private LocalDateTime getRandomExpiredAt(LocalDateTime fromDate) {
-        return fromDate.plusDays((long)(Math.random() * 7) + 1);
-    }
-
-    private String getUUIDCouponCode() {
-        return UUID.randomUUID().toString();
     }
 }
