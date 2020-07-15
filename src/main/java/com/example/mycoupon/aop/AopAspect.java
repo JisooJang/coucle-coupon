@@ -1,17 +1,16 @@
 package com.example.mycoupon.aop;
 
-import com.example.mycoupon.domain.Member;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.springframework.stereotype.Component;
 
+
 @Aspect
 @Component
 @Slf4j
 public class AopAspect {
-    // define pointcut and advice
     //@Around(value="@annotation(LogExecutionTime) && args(member)", argNames = "member")
     @Around(value="@annotation(LogExecutionTime)")
     public Object LogExecutionTime(ProceedingJoinPoint joinPoint) throws Throwable {
