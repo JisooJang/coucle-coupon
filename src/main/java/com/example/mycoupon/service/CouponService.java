@@ -14,6 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
@@ -57,6 +58,7 @@ public class CouponService {
 
     // 트랜잭션 전파 유형 : PROPAGATION_REQUIRED (기본값)
     // 이미 존재하는 부모 트랜잭션이 있다면 부모 트랜잭션 내에서 실행되고, 부모 트랜잭션이 없다면 새 트랜잭션이 시작된다.
+    @Async
     @Transactional
     public CompletableFuture<Coupon> save() {
         return CompletableFuture.supplyAsync(() -> {
@@ -77,7 +79,7 @@ public class CouponService {
     }
 
     @Transactional
-    public Coupon saveByMember(Member member) {
+    public Coupon saveNewCouponByMember(Member member) {
         LocalDateTime nowDateLocal = LocalDateTime.now();
         Coupon coupon = Coupon.builder()
                 .code(getUUIDCouponCode())
@@ -96,9 +98,18 @@ public class CouponService {
         return couponResult;
     }
 
+    @Transactional
+    public Coupon updateCouponByMember(Coupon coupon, Member member) {
+        LocalDateTime assignedAt = LocalDateTime.now();
+        coupon.setMember(member);  // update SQL
+        coupon.setAssignedAt(assignedAt);
+        coupon.setExpiredAt(getRandomExpiredAt(assignedAt));
+        return coupon;
+    }
+
+    @Async
     @CacheEvict(value="coupon-list", key="#member.id")
     @LogExecutionTime
-    @Transactional
     public CompletableFuture<String> assignToUserAsync(Member member) throws ExecutionException, InterruptedException {
         return CompletableFuture.supplyAsync(() -> {
             log.info("current Thread name : " + Thread.currentThread().getName());
@@ -106,14 +117,9 @@ public class CouponService {
             Optional<Coupon> coupon = couponRepository.findByFreeUser();
             Coupon couponResult;
             if(!coupon.isPresent()) {
-                // FIXME : inner method call -> saveByMember 메서드는 transactional 적용 안됨!
-                couponResult = saveByMember(member);
+                couponResult = saveNewCouponByMember(member);
             } else {
-                couponResult = coupon.get();
-                LocalDateTime assignedAt = LocalDateTime.now();
-                couponResult.setMember(member);  // update SQL
-                couponResult.setAssignedAt(assignedAt);
-                couponResult.setExpiredAt(getRandomExpiredAt(assignedAt));
+                couponResult = updateCouponByMember(coupon.get(), member);
             }
             return couponResult.getCode();
         }).exceptionally((ex) -> {
