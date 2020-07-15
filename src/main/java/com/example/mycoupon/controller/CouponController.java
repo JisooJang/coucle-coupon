@@ -1,6 +1,5 @@
 package com.example.mycoupon.controller;
 
-import com.example.mycoupon.aop.LogExecutionTime;
 import com.example.mycoupon.domain.Coupon;
 import com.example.mycoupon.domain.Member;
 import com.example.mycoupon.exceptions.CouponNotFoundException;
@@ -14,12 +13,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import javax.xml.ws.Response;
 import java.net.URI;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.Callable;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
@@ -42,7 +38,6 @@ public class CouponController {
         this.memberService = memberService;
     }
 
-    @LogExecutionTime
     @PostMapping("/{num}")
     public ResponseEntity<?> saveCoupon(@PathVariable("num") int num, @RequestAttribute long memberId) throws InterruptedException {
         if(num > 100000) {
@@ -83,18 +78,12 @@ public class CouponController {
     }
 
     @PutMapping("/{coupon_code}")
-    public ResponseEntity<?> useCoupon(@PathVariable("coupon_code") String couponCode,
+    public ResponseEntity<?> updateWhetherUsingCoupon(@PathVariable("coupon_code") String couponCode,
+                                       @RequestParam("is_used") Boolean isUsed,
                                        @RequestAttribute("memberId") long memberId) throws CouponNotFoundException {
-        couponservice.validateCouponCode(couponCode);
-        couponservice.updateIsEnabledCouponById(couponCode, memberId, true);
-        return ResponseEntity.ok().build();
-    }
 
-    @PutMapping("/{coupon_code}/cancel")
-    public ResponseEntity<?> cancelUseCoupon(@PathVariable("coupon_code") String couponCode,
-                                             @RequestAttribute("memberId") long memberId) throws CouponNotFoundException {
         couponservice.validateCouponCode(couponCode);
-        couponservice.updateIsEnabledCouponById(couponCode, memberId,false);
+        couponservice.updateIsEnabledCouponById(couponCode, memberId, isUsed);
         return ResponseEntity.ok().build();
     }
 
