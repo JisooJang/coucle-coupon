@@ -4,6 +4,10 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 public class CouponUtils {
+    public CouponUtils() throws Exception {
+        throw new Exception("you do not need to construct CouponUtils class!");
+    }
+
     public static String getUUIDCouponCode() {
         // format : uuid
         return UUID.randomUUID().toString();
