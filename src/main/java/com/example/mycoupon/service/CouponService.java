@@ -4,6 +4,7 @@ import com.example.mycoupon.aop.LogExecutionTime;
 import com.example.mycoupon.domain.Coupon;
 import com.example.mycoupon.exceptions.InvalidPayloadException;
 import com.example.mycoupon.repository.CouponRepository;
+import com.example.mycoupon.utils.CouponUtils;
 import com.example.mycoupon.utils.ValidationRegex;
 import com.example.mycoupon.domain.CouponInfo;
 import com.example.mycoupon.domain.Member;
@@ -31,11 +32,11 @@ import java.util.regex.Pattern;
 @Service
 public class CouponService {
     private final CouponRepository couponRepository;
-
     private final CouponInfoRepository couponInfoRepository;
 
     @Autowired
-    public CouponService(CouponRepository couponRepository, CouponInfoRepository couponInfoRepository) {
+    public CouponService(CouponRepository couponRepository,
+                         CouponInfoRepository couponInfoRepository) {
         this.couponRepository = couponRepository;
         this.couponInfoRepository = couponInfoRepository;
     }
@@ -46,25 +47,16 @@ public class CouponService {
         }
     }
 
-    public String getUUIDCouponCode() {
-        // format : uuid
-        return UUID.randomUUID().toString();
-    }
-
-    public LocalDateTime getRandomExpiredAt(LocalDateTime fromDate) {
-        // add random expired days from now date (1 day ~ 7 days)
-        return fromDate.plusDays((long)(Math.random() * 7) + 1);
-    }
-
     // 트랜잭션 전파 유형 : PROPAGATION_REQUIRED (기본값)
     // 이미 존재하는 부모 트랜잭션이 있다면 부모 트랜잭션 내에서 실행되고, 부모 트랜잭션이 없다면 새 트랜잭션이 시작된다.
+    // FIXME : @Async, @Transactional 둘다 AOP 사용하여 적용 안됨.
     @Async
     @Transactional
     public CompletableFuture<Coupon> save() {
         return CompletableFuture.supplyAsync(() -> {
             LocalDateTime nowDateLocal = LocalDateTime.now();
             Coupon coupon = Coupon.builder()
-                    .code(getUUIDCouponCode())
+                    .code(CouponUtils.getUUIDCouponCode())
                     .build();
 
             Coupon couponResult = couponRepository.save(coupon);
@@ -78,13 +70,14 @@ public class CouponService {
         });
     }
 
+    // FIXME : @Async annotation 메서드에서 콜되므로 @Transactional 적용 안됨.
     @Transactional
     public Coupon saveNewCouponByMember(Member member) {
         LocalDateTime nowDateLocal = LocalDateTime.now();
         Coupon coupon = Coupon.builder()
-                .code(getUUIDCouponCode())
+                .code(CouponUtils.getUUIDCouponCode())
                 .assignedAt(nowDateLocal)
-                .expiredAt(getRandomExpiredAt(nowDateLocal))
+                .expiredAt(CouponUtils.getRandomExpiredAt(nowDateLocal))
                 .member(member)
                 .build();
 
@@ -98,16 +91,17 @@ public class CouponService {
         return couponResult;
     }
 
-    @Transactional
+    // TODO CHECK : JPA Persistence context의 변경 감지 기능 동작해야 함.
+    @Transactional // using AOP
     public Coupon updateCouponByMember(Coupon coupon, Member member) {
         LocalDateTime assignedAt = LocalDateTime.now();
         coupon.setMember(member);  // update SQL
         coupon.setAssignedAt(assignedAt);
-        coupon.setExpiredAt(getRandomExpiredAt(assignedAt));
+        coupon.setExpiredAt(CouponUtils.getRandomExpiredAt(assignedAt));
         return coupon;
     }
 
-    @Async
+    @Async // @Async annotation using AOP
     @CacheEvict(value="coupon-list", key="#member.id")
     @LogExecutionTime
     public CompletableFuture<String> assignToUserAsync(Member member) throws ExecutionException, InterruptedException {
