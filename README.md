@@ -141,7 +141,9 @@ spring-cloud-starter-openfeign
 - 각 `service`에서 필요한 repository의 메소드를 호출하도록 설계하였다. 
 - service에서는 repository를 호출하기 전에, 필요한 경우 `validation`을 수행하여 통과하지 못하면 400대 에러를 리턴하도록 설계하였다.
 - `controller`에서는 내용의 존재여부, 에러 발생 여부에 따라 알맞은 status_code와 Coupon 데이터를 리턴한다.
-- `CouponService`에서 사용하지 않은 유저의 쿠폰 정보를 받아올 때는 `@Cacheable` 처리, 유저 쿠폰 사용이 update될 때는 `@CacheEvict`를 사용하여 캐싱 처리. 
+- `CouponService`에서 사용하지 않은 유저의 쿠폰 정보를 받아올 때는 `@Cacheable`를 사용하려 캐싱 처리, 유저 쿠폰 사용이 update될 때는 `@CacheEvict`를 사용하여 캐싱 처리. 
+- **save coupon**
+    - `Couponservice.save` method는 @Async를 사용하여 비동기로 처리시키고, save method를 호출하는 Controller에서는, 만들 쿠폰 갯수만큼 save 메서드를 CompletableFuture.allOf 메서드를 이용하여 각 저장하는 메서드를 병렬로 처리시킴.
 ### Test 설계
 테스트 구조는 아래와 같다.
 ```
@@ -243,8 +245,9 @@ gradlew test
     - 쿠폰이 없을 경우 204 NO-CONTENT.
   
   
-- 사용자 쿠폰 사용 : 
+- 사용자 쿠폰 사용 / 사용 취소 : 
   - endpoint : `/coupon/{coupon_code}`
+  - query-param : `is_used={value}` : 사용 / 사용취소 여부 명시. value는 boolean값.(true/false 또는 1/0)
   - method: `PUT`
   - request-header: 로그인/가입시 전달받은 JWT를 Authorization Bearer {JWT} 형식으로 전달.
   - response: 
@@ -253,15 +256,6 @@ gradlew test
     - 쿠폰번호에 해당하는 쿠폰이 없을 경우 404 NOT-FOUND.
     - 쿠폰번호에 해당하는 쿠폰이 해당 사용자의 소유가 아니면 403 FORBIDDEN
     
-- 사용자 쿠폰 사용 취소 : 
-  - endpoint : `/coupon/{coupon_code}/cancel`
-  - method: `PUT`
-  - request-header: 로그인/가입시 전달받은 JWT를 Authorization Bearer {JWT} 형식으로 전달.
-  - response: 
-    - 200 OK (body: coupon data). 
-    - 쿠폰번호가 UUID 형식이 아닌경우 400 BAD-REQUEST
-    - 쿠폰번호에 해당하는 쿠폰이 없을 경우 404 NOT-FOUND.
-    - 쿠폰번호에 해당하는 쿠폰이 해당 사용자의 소유가 아니면 403 FORBIDDEN
     
 - 당일 만료되는 쿠폰 조회 : 
   - endpoint : `/coupon/expired`
