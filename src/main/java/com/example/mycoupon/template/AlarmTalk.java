@@ -7,12 +7,14 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 public class AlarmTalk {
-    private String mediaId;
+    private String countryCode;
     private String phoneNumber;
+    private String message;
 
     @Builder
-    public AlarmTalk(String mediaId, String phoneNumber) {
-        this.mediaId = mediaId;
+    public AlarmTalk(String countryCode, String phoneNumber, String message) {
+        this.countryCode = countryCode;
         this.phoneNumber = phoneNumber;
+        this.message = message;
     }
 }
