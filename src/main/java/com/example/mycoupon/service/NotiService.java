@@ -20,7 +20,7 @@ public class NotiService {
     @Async
     public void sendAlarmTalkToUser(AlarmTalk alarmTalk) {
         // 테스트용으로 로그만 찍음. 향후 알림톡을 보내거나 메시지 큐 구조로 메시지를 쏘는 등의 작업이 될 수 있다.
-        log.info("Your coupon expires in 3 days. userId : " + alarmTalk.getMediaId() + " - " + Thread.currentThread().getName());
+        log.info("Your coupon expires in 3 days. userNumber : " + alarmTalk.getPhoneNumber() + " - " + Thread.currentThread().getName());
         kafkaTemplate.send("alarmtalk.notification", alarmTalk);
 
     }
