@@ -8,6 +8,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
+import org.springframework.kafka.core.KafkaTemplate;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -23,9 +24,12 @@ public class CouponSchedulerServiceTest {
 
     private CouponSchedulerService schedulerService;
 
+    @Mock
+    private NotiService notiService;
+
     @Before
     public void prepare() {
-        this.schedulerService = new CouponSchedulerService(couponRepository, new NotiService());
+        this.schedulerService = new CouponSchedulerService(couponRepository, notiService);
     }
     @Test
     public void sendNoticeExpiredAfter3days() {
@@ -38,11 +42,13 @@ public class CouponSchedulerServiceTest {
                     .password("test1234!")
                     .build();
 
+            Long memberId = 1L;
+
             Coupon coupon = Coupon.builder()
                     .code(UUID.randomUUID().toString())
                     .assignedAt(nowDateLocal)
                     .expiredAt(nowDateLocal.plusDays((long)3))
-                    .member(m)
+                    .memberId(memberId)
                     .build();
             couponList.add(coupon);
         }
