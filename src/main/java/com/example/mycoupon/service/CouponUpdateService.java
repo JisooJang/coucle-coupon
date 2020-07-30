@@ -25,13 +25,14 @@ public class CouponUpdateService {
     }
 
     @Transactional
-    public Coupon saveNewCouponByMember(Member member) {
+    public Coupon saveNewCouponByMember(Long memberId) {
         LocalDateTime nowDateLocal = LocalDateTime.now();
         Coupon coupon = Coupon.builder()
                 .code(CouponUtils.getUUIDCouponCode())
                 .assignedAt(nowDateLocal)
                 .expiredAt(CouponUtils.getRandomExpiredAt(nowDateLocal))
-                .member(member)
+                //.member(member)
+                .memberId(memberId)
                 .build();
 
         Coupon couponResult = couponRepository.save(coupon);
@@ -46,9 +47,10 @@ public class CouponUpdateService {
 
     // TODO CHECK : JPA Persistence context의 변경 감지 기능 동작해야 함.
     @Transactional // using AOP
-    public Coupon updateCouponByMember(Coupon coupon, Member member) {
+    public Coupon updateCouponByMember(Coupon coupon, Long memberId) {
         LocalDateTime assignedAt = LocalDateTime.now();
-        coupon.setMember(member);  // update SQL
+        //coupon.setMember(member);  // update SQL
+        coupon.setMemberId(memberId);
         coupon.setAssignedAt(assignedAt);
         coupon.setExpiredAt(CouponUtils.getRandomExpiredAt(assignedAt));
 

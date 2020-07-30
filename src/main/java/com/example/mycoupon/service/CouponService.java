@@ -48,35 +48,34 @@ public class CouponService {
     @Transactional
     public CompletableFuture<Coupon> save() {
         return CompletableFuture.supplyAsync(() -> {
-            LocalDateTime nowDateLocal = LocalDateTime.now();
             Coupon coupon = Coupon.builder()
                     .code(CouponUtils.getUUIDCouponCode())
                     .build();
-
             Coupon couponResult = couponRepository.save(coupon);
+
             CouponInfo couponInfo = CouponInfo.builder()
                     .couponId(couponResult.getId())
                     .isUsed(false)
                     .build();
-
             couponInfoRepository.save(couponInfo);
+
             return couponResult;
         });
     }
 
     @Async // @Async annotation using AOP
-    @CacheEvict(value="coupon-list", key="#member.id")
+    @CacheEvict(value="coupon-list", key="#memberId")
     @LogExecutionTime
-    public CompletableFuture<String> assignToUserAsync(Member member) throws ExecutionException, InterruptedException {
+    public CompletableFuture<String> assignToUserAsync(Long memberId) throws ExecutionException, InterruptedException {
         return CompletableFuture.supplyAsync(() -> {
             log.info("current Thread name : " + Thread.currentThread().getName());
 
             Optional<Coupon> coupon = couponRepository.findByFreeUser();
             Coupon couponResult;
             if(!coupon.isPresent()) {
-                couponResult = couponUpdateService.saveNewCouponByMember(member);
+                couponResult = couponUpdateService.saveNewCouponByMember(memberId);
             } else {
-                couponResult = couponUpdateService.updateCouponByMember(coupon.get(), member);
+                couponResult = couponUpdateService.updateCouponByMember(coupon.get(), memberId);
             }
             return couponResult.getCode();
         }).exceptionally((ex) -> {
@@ -94,7 +93,7 @@ public class CouponService {
         if(coupon == null) {
             throw new CouponNotFoundException(code);
         }
-        if(coupon.getMember().getId() != memberId) {
+        if(coupon.getMemberId() != memberId) {
             throw new CouponMemberNotMatchException(code);
         }
         coupon.getCouponInfo().setIsUsed(isUsed);
