@@ -16,7 +16,6 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
 import java.util.List;
-import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
@@ -39,8 +38,8 @@ public class CouponController {
         this.memberService = memberService;
     }
 
-    @PostMapping("/{num}")
-    public ResponseEntity<?> saveCoupon(@PathVariable("num") int num, @RequestAttribute long memberId) throws InterruptedException {
+    @PostMapping("/admin/{num}")
+    public ResponseEntity<?> saveCoupon(@PathVariable("num") Integer num, @RequestAttribute Long memberId) throws InterruptedException {
         if(num > 100000) {
             throw new InvalidPayloadException("The number of coupon should be less than 1000000.");
         }
@@ -50,7 +49,7 @@ public class CouponController {
                 .collect(Collectors.toList());
 
         CompletableFuture.allOf(futureList.toArray(new CompletableFuture[num]))
-                .thenAccept(s -> log.info("Computation returned: " + s));
+                .thenAccept(s -> log.info("Computation returned: " + s)); // non-blocking callback method
 
         URI selfLink = URI.create(
                 ServletUriComponentsBuilder.fromCurrentRequest().toUriString()
@@ -58,19 +57,22 @@ public class CouponController {
         return ResponseEntity.created(selfLink).build();
     }
 
-    @PutMapping("/user")
-    public ResponseEntity<String> assignToUserCouponAsync(@RequestAttribute("memberId") long memberId) throws MemberNotFoundException, ExecutionException, InterruptedException { // user_id는 JwtAuthorizationFilter에서 넘겨줌.
-        Optional<Member> member = memberService.findById(memberId);
-        if(member.isPresent()) {
-            CompletableFuture<String> futureResult = couponservice.assignToUserAsync(member.get());
-            return ResponseEntity.ok().body(futureResult.get());
-        } else {
-            throw new MemberNotFoundException(memberId);
-        }
+    @PutMapping("/user/{targetId}")
+    public ResponseEntity<String> assignToUserCouponAsync(@RequestAttribute("memberId") Long memberId,
+                                                          @PathVariable("targetId") Long targetId) throws MemberNotFoundException, ExecutionException, InterruptedException { // user_id는 JwtAuthorizationFilter에서 넘겨줌.
+//        Optional<Member> member = memberService.findById(memberId);
+//        if(member.isPresent()) {
+//            CompletableFuture<String> futureResult = couponservice.assignToUserAsync(member.get());
+//            return ResponseEntity.ok().body(futureResult.get());
+//        } else {
+//            throw new MemberNotFoundException(memberId);
+//        }
+        CompletableFuture<String> futureResult = couponservice.assignToUserAsync(targetId);
+        return ResponseEntity.ok().body(futureResult.get());
     }
 
     @GetMapping("/user")
-    public ResponseEntity<List<Coupon>> getUserCoupons(@RequestAttribute("memberId") long memberId) throws MemberNotFoundException {
+    public ResponseEntity<List<Coupon>> getUserCoupons(@RequestAttribute("memberId") Long memberId) throws MemberNotFoundException {
         List<Coupon> coupons = couponservice.findByMember(memberId);
         if(coupons == null || coupons.size() == 0) {
             return ResponseEntity.noContent().build();
@@ -81,7 +83,7 @@ public class CouponController {
     @PutMapping("/{coupon_code}")
     public ResponseEntity<?> updateWhetherUsingCoupon(@PathVariable("coupon_code") String couponCode,
                                        @RequestParam("is_used") Boolean isUsed,
-                                       @RequestAttribute("memberId") long memberId) throws CouponNotFoundException {
+                                       @RequestAttribute("memberId") Long memberId) throws CouponNotFoundException {
 
         log.info("updateIsEnabledCouponById controller current Thread name : " + Thread.currentThread().getName());
         CouponUtils.validateCouponCode(couponCode);
@@ -89,7 +91,7 @@ public class CouponController {
         return ResponseEntity.ok().build();
     }
 
-    @GetMapping("/expired")
+    @GetMapping("/admin/expired")
     public ResponseEntity<List<Coupon>> getExpiredCoupon() {
         List<Coupon> coupons = couponservice.findExpiredToday();
         if(coupons == null || coupons.size() == 0) {
