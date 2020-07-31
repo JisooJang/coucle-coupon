@@ -19,7 +19,7 @@ spring-boot-starter-data-redis
 spring-kafka
 java-jwt
 lombok
-h2-database
+mysql-database
 
 spring-cloud-starter-netflix-eureka-client
 spring-cloud-starter-openfeign
@@ -133,7 +133,7 @@ spring-cloud-starter-openfeign
  `CustomAuthenticationEntryPoint`를 작성하여 가능한 에러에 따라 응답코드와 에러메시지를 설정하였다. 
 ***
 
-### Entity 설계 및 연관관계
+### Entity 설계 및 연관관계 (MYSQL)
 - **Coupon - Member (ManyToOne)** 단방향 연관 관계. Coupon entity(Many)에서 Member 필드를 가지도록 설계하였다. 
 - 유저는 쿠폰을 가지고 있을 수도 있고, 하나도 가지고 없을 수도 있다.
 - **Coupon - CouponInfo (OneToOne)** 단방향 연관 관계. Coupon entity에서 CouponInfo 필드를 가지도록 설계하였다.
@@ -214,7 +214,8 @@ gradlew test
 
 ## API specification
 **기본 요청 주소 : `http://localhost:8083/`** <br>
-**H2 DB client host : `http://localhost:8083/h2-console`** 
+**MYSQL DB client host (AWS-RDS) : `jdbc:mysql://coucle-database.cehugrqcry5h.ap-northeast-2.rds.amazonaws.com:3306`** 
+**Database : coucle-coupon**<br>
 
 - signup : 
   - endpoint : `/signup`
