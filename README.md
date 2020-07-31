@@ -253,7 +253,36 @@ gradlew test
   - response: 
     - 200 OK (body: coupon data - 사용한 쿠폰은 response에서 제외됨) 
     - 쿠폰이 없을 경우 204 NO-CONTENT.
-  
+  ```
+  [
+    {
+      "id": 1,
+      "code": "1da08afd-312f-476b-b763-fb55e1cbd0ba",
+      "createdAt": "2020-07-31 11:53:54",
+      "expiredAt": "2020-08-01 11:54:50",
+      "assignedAt": "2020-07-31 11:54:50",
+      "couponInfo": {
+        "couponId": 1,
+        "isUsed": false,
+        "lastUpdatedTime": "2020-07-31 11:53:54"
+      },
+      "version": 1
+    },
+    {
+      "id": 2,
+      "code": "e45c04ca-f06d-4a56-b684-a98796107581",
+      "createdAt": "2020-07-31 11:53:54",
+      "expiredAt": "2020-08-03 11:55:12",
+      "assignedAt": "2020-07-31 11:55:12",
+      "couponInfo": {
+        "couponId": 2,
+        "isUsed": false,
+        "lastUpdatedTime": "2020-07-31 11:53:54"
+      },
+      "version": 1
+    }
+  ]
+  ```
   
 - 사용자 쿠폰 사용 / 사용 취소 : 
   - endpoint : `/coupon/{coupon_code}`
@@ -273,8 +302,24 @@ gradlew test
   - request-header: 로그인/가입시 전달받은 JWT를 Authorization Bearer {JWT} 형식으로 전달.
   - response: 
     - 200 OK (body: coupon data). 
-    - 당일 만료되는 쿠폰이 없을경우 204 NO_CONTENT
-    
+    - 당일 만료되는 쿠폰이 없을 경우 204 NO_CONTENT
+    ```
+    [
+        {
+          "id": 1,
+          "code": "1da08afd-312f-476b-b763-fb55e1cbd0ba",
+          "createdAt": "2020-07-31 11:53:54",
+          "expiredAt": "2020-08-01 11:54:50",
+          "assignedAt": "2020-07-31 11:54:50",
+          "couponInfo": {
+            "couponId": 1,
+            "isUsed": false,
+            "lastUpdatedTime": "2020-07-31 11:53:54"
+          },
+          "version": 1
+        }
+      ]
+    ```
     
   
 
