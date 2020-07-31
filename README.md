@@ -214,8 +214,8 @@ gradlew test
 
 ## API specification
 **기본 요청 주소 : `http://localhost:8083/`** <br>
-**MYSQL DB client host (AWS-RDS) : `jdbc:mysql://coucle-database.cehugrqcry5h.ap-northeast-2.rds.amazonaws.com:3306`** 
-**Database : coucle-coupon**<br>
+**MYSQL DB client host (AWS-RDS) : `coucle-database.cehugrqcry5h.ap-northeast-2.rds.amazonaws.com:3306`** <br>
+**Database : `coucle-coupon`**<br>
 
 - signup : 
   - endpoint : `/signup`
