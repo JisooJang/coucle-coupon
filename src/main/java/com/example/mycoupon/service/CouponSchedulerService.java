@@ -30,21 +30,21 @@ public class CouponSchedulerService {
     @Scheduled(cron = "0 0 13 * * ?")
     public void sendNoticeExpiredAfter3days() {
         List<Coupon> expiredList = couponRepository.findByExpiredAfter3Days();
-
         // send message to each user.
-        for(Coupon coupon : expiredList) {
-            Member member = coupon.getMember();
-            AlarmTalk alarmTalk = AlarmTalk.builder()
-                    .countryCode(CountryCode.SOUTH_KOREA)
-                    .phoneNumber(member.getPhoneNumber())
-                    .message(getExpiredAlarmMessage(member.getMediaId(), coupon.getCode()))
-                    .build();
-            notiService.sendAlarmTalkToUser(alarmTalk); // TODO : 비동기 실행
-        }
+        // FIXME : get member info by requesting user service
+//        for(Coupon coupon : expiredList) {
+//            Member member = coupon.getMember();
+//            AlarmTalk alarmTalk = AlarmTalk.builder()
+//                    .countryCode(CountryCode.SOUTH_KOREA)
+//                    .phoneNumber(member.getPhoneNumber())
+//                    .message(getExpiredAlarmMessage(member.getMediaId(), coupon.getCode()))
+//                    .build();
+//            notiService.sendAlarmTalkToUser(alarmTalk);
+//        }
     }
 
 //    @Async
-//    @Scheduled(cron = "0 30 23 * * ?")
+//    @Scheduled(cron = "0 50 21 * * ?")
 //    public void sendNoticeExpiredAfter3daysForTesting() {
 //        AlarmTalk alarmTalk = AlarmTalk.builder()
 //                .countryCode(CountryCode.SOUTH_KOREA)

@@ -4,6 +4,7 @@ import com.example.mycoupon.domain.Coupon;
 import com.example.mycoupon.exceptions.InvalidPayloadException;
 import com.example.mycoupon.service.CouponService;
 import com.example.mycoupon.domain.Member;
+import com.example.mycoupon.service.CouponUpdateService;
 import com.example.mycoupon.service.MemberService;
 import com.example.mycoupon.exceptions.MemberNotFoundException;
 import org.junit.Before;
@@ -30,6 +31,9 @@ import static org.mockito.BDDMockito.given;
 public class CouponControllerTest {
     @Mock
     private CouponService couponService;
+
+    @Mock
+    private CouponUpdateService couponUpdateService;
 
     @Mock
     private MemberService memberService;
@@ -61,13 +65,14 @@ public class CouponControllerTest {
 
     @Test
     public void assignToUserCouponSuccess() throws Exception {
-        long memberId = 1L;
+        long targetId = 1L;
+        long fakeMemberId = 2L;
         Member fakeMember = Member.builder().mediaId("test1234").password("qwer1234!").build();
-        given(this.memberService.findById(memberId)).willReturn(java.util.Optional.ofNullable(fakeMember));
+        given(this.memberService.findById(targetId)).willReturn(java.util.Optional.ofNullable(fakeMember));
 
-        Coupon fakeCoupon = Coupon.builder().code(UUID.randomUUID().toString()).member(fakeMember).build();
-        given(this.couponService.assignToUser(fakeMember)).willReturn(fakeCoupon.getCode());
-        ResponseEntity<?> result = couponController.assignToUserCoupon(memberId);
+        Coupon fakeCoupon = Coupon.builder().code(UUID.randomUUID().toString()).memberId(targetId).build();
+        //given(this.couponService.assignToUserAsync(targetId)).willReturn(fakeCoupon.getCode());
+        ResponseEntity<?> result = couponController.assignToUserCouponAsync(fakeMemberId, targetId);
 
         assertThat(result.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(result.getBody()).isEqualTo(fakeCoupon.getCode());
@@ -76,9 +81,10 @@ public class CouponControllerTest {
     @Test(expected = MemberNotFoundException.class)
     public void assignToUserCouponMemberNotFound() throws Exception {
         long memberId = 1L;
+        Long targetId = 2L;
         Member fakeMember = Member.builder().mediaId("test1234").password("qwer1234!").build();
         given(this.memberService.findById(memberId)).willReturn(Optional.empty());
-        ResponseEntity<?> result = couponController.assignToUserCoupon(memberId);
+        ResponseEntity<?> result = couponController.assignToUserCouponAsync(memberId, targetId);
     }
 
     @Test
@@ -86,8 +92,8 @@ public class CouponControllerTest {
         long memberId = 1L;
         Member fakeMember = Member.builder().mediaId("test1234").password("test1234!").build();
         List<Coupon> fakeCoupons = Arrays.asList(
-                Coupon.builder().code(UUID.randomUUID().toString()).member(fakeMember).build(),
-                Coupon.builder().code(UUID.randomUUID().toString()).member(fakeMember).build());
+                Coupon.builder().code(UUID.randomUUID().toString()).memberId(memberId).build(),
+                Coupon.builder().code(UUID.randomUUID().toString()).memberId(memberId).build());
         given(couponService.findByMember(memberId)).willReturn(fakeCoupons);
 
         ResponseEntity<?> result = couponController.getUserCoupons(memberId);
@@ -109,7 +115,7 @@ public class CouponControllerTest {
         String fakeCouponCode = UUID.randomUUID().toString();
         long memberId = 1L;
 
-        ResponseEntity<?> result = couponController.useCoupon(fakeCouponCode, memberId);
+        ResponseEntity<?> result = couponController.updateWhetherUsingCoupon(fakeCouponCode, true, memberId);
         assertThat(result.getStatusCode()).isEqualTo(HttpStatus.OK);
     }
 
@@ -118,7 +124,7 @@ public class CouponControllerTest {
         String fakeCouponCode = UUID.randomUUID().toString();
         long memberId = 1L;
 
-        ResponseEntity<?> result = couponController.cancelUseCoupon(fakeCouponCode, memberId);
+        ResponseEntity<?> result = couponController.updateWhetherUsingCoupon(fakeCouponCode, false, memberId);
         assertThat(result.getStatusCode()).isEqualTo(HttpStatus.OK);
     }
 
