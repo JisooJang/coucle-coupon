@@ -19,8 +19,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.time.LocalDateTime;
 import java.util.*;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
@@ -37,27 +35,23 @@ public class CouponServiceTest {
 
     private CouponService couponService;
 
-    private CouponUpdateService couponUpdateService;
-
     private final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
     @Before
     public void prepare() {
-        this.couponUpdateService = new CouponUpdateService(couponRepository, couponInfoRepository);
-        this.couponService = new CouponService(couponRepository, couponInfoRepository, couponUpdateService);
+        this.couponService = new CouponService(couponRepository, couponInfoRepository);
     }
 
     @Test
-    public void save() throws ExecutionException, InterruptedException {
+    public void save() {
         Coupon coupon = Coupon.builder().code(UUID.randomUUID().toString()).build();
         given(couponRepository.save(any(Coupon.class))).willReturn(coupon);
-        CompletableFuture<Coupon> couponResult = couponService.save();
+        Coupon couponResult = couponService.save(null);
 
-        assertThat(couponResult.get()).isEqualTo(coupon);
+        assertThat(couponResult).isEqualTo(coupon);
     }
     @Test
     public void saveByMember() {
-        Long memberId = 1L;
         Member member = Member.builder()
                 .mediaId("test1234")
                 .password(this.passwordEncoder.encode("qwer1234!"))
@@ -65,24 +59,23 @@ public class CouponServiceTest {
 
         Coupon coupon = Coupon.builder().code(UUID.randomUUID().toString()).build();
         given(couponRepository.save(any(Coupon.class))).willReturn(coupon);
-        Coupon couponResult = couponUpdateService.saveNewCouponByMember(memberId);
+        Coupon couponResult = couponService.save(member);
 
         assertThat(couponResult).isEqualTo(coupon);
     }
 
     @Test
-    public void assignToUser() throws InterruptedException, ExecutionException {
-        given(this.couponRepository.findByFreeUser().get()).willReturn(
+    public void assignToUser() throws InterruptedException {
+        given(this.couponRepository.findByFreeUser()).willReturn(
                 Coupon.builder().code("1234").build());
 
-        Long memberId = 1L;
         Member member = Member.builder()
                 .mediaId("test1234")
                 .password(this.passwordEncoder.encode("qwer1234!"))
                 .build();
 
-        CompletableFuture<String> couponCode = couponService.assignToUserAsync(memberId);
-        assertThat(couponCode.get()).isNotNull();
+        String couponCode = couponService.assignToUser(member);
+        assertThat(couponCode).isNotNull();
     }
 
     @Test(expected = CouponNotFoundException.class)
@@ -101,7 +94,7 @@ public class CouponServiceTest {
 
         given(this.couponRepository.findByCode(testCode)).willReturn(
                 Coupon.builder()
-                .memberId(m.getId())
+                .member(m)
                 .code(testCode)
                 .createdAt(tmpDate)
                 .assignedAt(tmpDate)
@@ -114,12 +107,11 @@ public class CouponServiceTest {
     @Test
     public void updateIsEnabledCouponById() {
         String testCode = UUID.randomUUID().toString();
-        Long memberId = 1L;
         Member m = Member.builder()
                 .mediaId("test1234")
                 .password(passwordEncoder.encode("test1234!"))
                 .build();
-        Coupon coupon = Coupon.builder().code(testCode).memberId(memberId).build();
+        Coupon coupon = Coupon.builder().code(testCode).member(m).build();
         CouponInfo info = CouponInfo.builder().couponId(coupon.getId()).isUsed(false).build();
         coupon.setCouponInfo(info);
         given(this.couponRepository.findByCode(testCode)).willReturn(coupon);
@@ -144,16 +136,16 @@ public class CouponServiceTest {
         assertThat(result.size()).isEqualTo(1);
     }
 
-//    @Test
-//    public void testTransactionalProxyInnerMethodCall() throws InterruptedException {
-//        Member m = Member.builder()
-//                .mediaId("test1234")
-//                .password(passwordEncoder.encode("test1234!"))
-//                .build();
-//        Coupon coupon = Coupon.builder().code(UUID.randomUUID().toString()).build();
-//        given(couponRepository.findByFreeUser()).willReturn(coupon);
-//
-//        String memberId = couponService.test(m);
-//        System.out.println(memberId);
-//    }
+    @Test
+    public void testTransactionalProxyInnerMethodCall() throws InterruptedException {
+        Member m = Member.builder()
+                .mediaId("test1234")
+                .password(passwordEncoder.encode("test1234!"))
+                .build();
+        Coupon coupon = Coupon.builder().code(UUID.randomUUID().toString()).build();
+        given(couponRepository.findByFreeUser()).willReturn(coupon);
+
+        String memberId = couponService.testTransactionalProxy(m);
+        System.out.println(memberId);
+    }
 }

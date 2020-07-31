@@ -30,30 +30,30 @@ public class CouponSchedulerService {
     @Scheduled(cron = "0 0 13 * * ?")
     public void sendNoticeExpiredAfter3days() {
         List<Coupon> expiredList = couponRepository.findByExpiredAfter3Days();
+
         // send message to each user.
-        // FIXME : get member info by requesting user service
-//        for(Coupon coupon : expiredList) {
-//            Member member = coupon.getMember();
-//            AlarmTalk alarmTalk = AlarmTalk.builder()
-//                    .countryCode(CountryCode.SOUTH_KOREA)
-//                    .phoneNumber(member.getPhoneNumber())
-//                    .message(getExpiredAlarmMessage(member.getMediaId(), coupon.getCode()))
-//                    .build();
-//            notiService.sendAlarmTalkToUser(alarmTalk);
-//        }
+        for(Coupon coupon : expiredList) {
+            Member member = coupon.getMember();
+            AlarmTalk alarmTalk = AlarmTalk.builder()
+                    .countryCode(CountryCode.SOUTH_KOREA)
+                    .phoneNumber(member.getPhoneNumber())
+                    .message(getExpiredAlarmMessage(member.getMediaId(), coupon.getCode()))
+                    .build();
+            notiService.sendAlarmTalkToUser(alarmTalk); // TODO : 비동기 실행
+        }
     }
 
-//    @Async
-//    @Scheduled(cron = "0 50 21 * * ?")
-//    public void sendNoticeExpiredAfter3daysForTesting() {
-//        AlarmTalk alarmTalk = AlarmTalk.builder()
-//                .countryCode(CountryCode.SOUTH_KOREA)
-//                .phoneNumber("01038050883")
-//                .message(getExpiredAlarmMessage("as00314", "ABCD-EFGH-IJKL"))
-//                .build();
-//        notiService.sendAlarmTalkToUser(alarmTalk);
-//
-//    }
+    @Async
+    @Scheduled(cron = "0 50 21 * * ?")
+    public void sendNoticeExpiredAfter3daysForTesting() {
+        AlarmTalk alarmTalk = AlarmTalk.builder()
+                .countryCode(CountryCode.SOUTH_KOREA)
+                .phoneNumber("01038050883")
+                .message(getExpiredAlarmMessage("as00314", "ABCD-EFGH-IJKL"))
+                .build();
+        notiService.sendAlarmTalkToUser(alarmTalk);
+
+    }
 
     public String getExpiredAlarmMessage(String mediaId, String couponCode) {
         return String.format("%s 회원님! coucle 서비스에서 보유하고 계신 쿠폰이 3일 후에 만료될 예정입니다. [쿠폰코드 : %s]",

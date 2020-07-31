@@ -15,7 +15,10 @@ import org.springframework.test.context.junit4.SpringRunner;
 import javax.validation.ConstraintViolationException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -43,11 +46,11 @@ public class CouponRepositoryTest {
                 .build();
         couponInfo = this.entityManager.persist(couponInfo);
 
-        Optional<Coupon> freeCoupon = couponRepository.findByFreeUser();
-        assertThat(freeCoupon.get()).isNotNull();
-        assertThat(freeCoupon.get().getMemberId()).isNull();
-        assertThat(freeCoupon.get().getAssignedAt()).isNull();
-        assertThat(freeCoupon.get().getExpiredAt()).isNull();
+        Coupon freeCoupon = couponRepository.findByFreeUser();
+        assertThat(freeCoupon).isNotNull();
+        assertThat(freeCoupon.getMember()).isNull();
+        assertThat(freeCoupon.getAssignedAt()).isNull();
+        assertThat(freeCoupon.getExpiredAt()).isNull();
     }
 
     @Test
@@ -74,7 +77,7 @@ public class CouponRepositoryTest {
         for(int i=0 ; i<2 ; i++) {
             Coupon coupon = Coupon.builder()
                     .code(UUID.randomUUID().toString())
-                    .memberId(member.getId())
+                    .member(member)
                     .build();
             coupon = this.entityManager.persist(coupon);
 
@@ -88,8 +91,8 @@ public class CouponRepositoryTest {
 
         List<Coupon> results = couponRepository.findByMemberId(member.getId());
         assertThat(results).size().isEqualTo(2);
-        assertThat(results.get(0).getMemberId()).isEqualTo(member.getId());
-        assertThat(results.get(1).getMemberId()).isEqualTo(member.getId());
+        assertThat(results.get(0).getMember().getId()).isEqualTo(member.getId());
+        assertThat(results.get(1).getMember().getId()).isEqualTo(member.getId());
     }
 
     @Test

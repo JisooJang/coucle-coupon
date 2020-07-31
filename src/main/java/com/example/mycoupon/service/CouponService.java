@@ -48,34 +48,35 @@ public class CouponService {
     @Transactional
     public CompletableFuture<Coupon> save() {
         return CompletableFuture.supplyAsync(() -> {
+            LocalDateTime nowDateLocal = LocalDateTime.now();
             Coupon coupon = Coupon.builder()
                     .code(CouponUtils.getUUIDCouponCode())
                     .build();
-            Coupon couponResult = couponRepository.save(coupon);
 
+            Coupon couponResult = couponRepository.save(coupon);
             CouponInfo couponInfo = CouponInfo.builder()
                     .couponId(couponResult.getId())
                     .isUsed(false)
                     .build();
-            couponInfoRepository.save(couponInfo);
 
+            couponInfoRepository.save(couponInfo);
             return couponResult;
         });
     }
 
     @Async // @Async annotation using AOP
-    @CacheEvict(value="coupon-list", key="#memberId")
+    @CacheEvict(value="coupon-list", key="#member.id")
     @LogExecutionTime
-    public CompletableFuture<String> assignToUserAsync(Long memberId) throws ExecutionException, InterruptedException {
+    public CompletableFuture<String> assignToUserAsync(Member member) throws ExecutionException, InterruptedException {
         return CompletableFuture.supplyAsync(() -> {
             log.info("current Thread name : " + Thread.currentThread().getName());
 
             Optional<Coupon> coupon = couponRepository.findByFreeUser();
             Coupon couponResult;
             if(!coupon.isPresent()) {
-                couponResult = couponUpdateService.saveNewCouponByMember(memberId);
+                couponResult = couponUpdateService.saveNewCouponByMember(member);
             } else {
-                couponResult = couponUpdateService.updateCouponByMember(coupon.get(), memberId);
+                couponResult = couponUpdateService.updateCouponByMember(coupon.get(), member);
             }
             return couponResult.getCode();
         }).exceptionally((ex) -> {
@@ -93,7 +94,7 @@ public class CouponService {
         if(coupon == null) {
             throw new CouponNotFoundException(code);
         }
-        if(coupon.getMemberId() != memberId) {
+        if(coupon.getMember().getId() != memberId) {
             throw new CouponMemberNotMatchException(code);
         }
         coupon.getCouponInfo().setIsUsed(isUsed);

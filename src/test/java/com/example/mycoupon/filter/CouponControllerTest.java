@@ -12,7 +12,6 @@ import com.example.mycoupon.domain.Member;
 import com.example.mycoupon.service.MemberService;
 import com.example.mycoupon.exceptions.CouponMemberNotMatchException;
 import com.example.mycoupon.exceptions.CouponNotFoundException;
-import com.example.mycoupon.utils.CouponUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -50,7 +49,6 @@ public class CouponControllerTest {
     private CouponRepository couponRepository;
 
     private final Calendar calendar = Calendar.getInstance();
-    private CouponUtils couponUtils;
 
     private String getJWT() {
         Date nowDate = new Date();
@@ -160,12 +158,11 @@ public class CouponControllerTest {
 
     @Test
     public void CouponPutUserSuccess() throws Exception {
-        Long memberId = 1L;
         Member fakeMember = Member.builder().mediaId("test").password("test1234").build();
         Coupon coupon = Coupon.builder().code(UUID.randomUUID().toString()).build();
 
-        given(memberService.findById(memberId)).willReturn(Optional.ofNullable(fakeMember));
-        //given(couponService.assignToUserAsync(memberId)).willReturn(coupon.getCode());
+        given(memberService.findById(any(Long.class))).willReturn(Optional.ofNullable(fakeMember));
+        given(couponService.assignToUser(fakeMember)).willReturn(coupon.getCode());
 
         mvc.perform(MockMvcRequestBuilders
                 .put("/coupon/user")
@@ -206,8 +203,7 @@ public class CouponControllerTest {
     public void CouponPutUseSuccess() throws Exception {
         String fakeCode = UUID.randomUUID().toString();
         Member fakeMember = Member.builder().mediaId("test").password("test1234").build();
-        Long memberId = 1L;
-        Coupon coupon = Coupon.builder().code(fakeCode).memberId(memberId).build();
+        Coupon coupon = Coupon.builder().code(fakeCode).member(fakeMember).build();
 
         given(couponRepository.findByCode(fakeCode)).willReturn(coupon);
         mvc.perform(MockMvcRequestBuilders
@@ -217,17 +213,18 @@ public class CouponControllerTest {
                 .andExpect(status().isOk());
     }
 
-//    @Test
-//    public void CouponPutUseFailureInvalidCode() throws Exception {
-//        String fakeCode = "fakeCouponCode";
-//        doThrow(new InvalidPayloadException("Invalid format of coupon code."))
-//                .when(couponUtils)
-//        mvc.perform(MockMvcRequestBuilders
-//                .put("/coupon/" + fakeCode)
-//                .header("Authorization", "Bearer " + getJWT())
-//                .contentType(MediaType.APPLICATION_JSON))
-//                .andExpect(status().isBadRequest());
-//    }
+    @Test
+    public void CouponPutUseFailureInvalidCode() throws Exception {
+        String fakeCode = "fakeCouponCode";
+
+        doThrow(new InvalidPayloadException("Invalid format of coupon code."))
+                .when(couponService).validateCouponCode(fakeCode);
+        mvc.perform(MockMvcRequestBuilders
+                .put("/coupon/" + fakeCode)
+                .header("Authorization", "Bearer " + getJWT())
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
 
     @Test
     public void CouponPutUseFailureCouponNotFound() throws Exception {
