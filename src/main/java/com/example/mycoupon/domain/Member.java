@@ -18,7 +18,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "member")
+@Table(name = "coucle_member")
 public class Member implements Serializable {
     // 각 필드 validation 상세 annotation 추가할 것. (size, blank 등)
     @Id
