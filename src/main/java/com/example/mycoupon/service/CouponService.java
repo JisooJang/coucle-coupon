@@ -8,7 +8,6 @@ import com.example.mycoupon.utils.CouponUtils;
 import com.example.mycoupon.domain.Member;
 import com.example.mycoupon.exceptions.CouponMemberNotMatchException;
 import com.example.mycoupon.exceptions.CouponNotFoundException;
-import com.example.mycoupon.repository.CouponInfoRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
@@ -27,21 +26,19 @@ import java.util.concurrent.ExecutionException;
 @Service
 public class CouponService {
     private final CouponRepository couponRepository;
-    private final CouponInfoRepository couponInfoRepository;
     private final CouponUpdateService couponUpdateService;
 
     @Autowired
-    public CouponService(CouponRepository couponRepository,
-                         CouponInfoRepository couponInfoRepository, CouponUpdateService couponUpdateService) {
+    public CouponService(CouponRepository couponRepository, CouponUpdateService couponUpdateService) {
         this.couponRepository = couponRepository;
-        this.couponInfoRepository = couponInfoRepository;
+        //this.couponInfoRepository = couponInfoRepository;
         this.couponUpdateService = couponUpdateService;
     }
 
     // 트랜잭션 전파 유형 : PROPAGATION_REQUIRED (기본값)
     // 이미 존재하는 부모 트랜잭션이 있다면 부모 트랜잭션 내에서 실행되고, 부모 트랜잭션이 없다면 새 트랜잭션이 시작된다.
     // FIXME : @Async, @Transactional 둘다 AOP 사용하여 적용 안됨? -> 로그보면 적용됨
-    @Async
+    @Async("asyncExecutor")
     @Transactional
     public CompletableFuture<Coupon> save() {
         return CompletableFuture.supplyAsync(() -> {
@@ -66,7 +63,6 @@ public class CouponService {
         });
     }
 
-    @Async // @Async annotation using AOP
     @CacheEvict(value="coupon-list", key="#member.id")
     @LogExecutionTime
     public CompletableFuture<String> assignToUserAsync(Member member) throws ExecutionException, InterruptedException {
@@ -88,7 +84,7 @@ public class CouponService {
         });
     }
 
-    @Async
+    @CacheEvict(value="coupon-list", key="#memberId")
     @Transactional
     public void updateIsEnabledCouponById(String code, long memberId, boolean isUsed) throws CouponNotFoundException {
         log.info("updateIsEnabledCouponById service current Thread name : " + Thread.currentThread().getName());
