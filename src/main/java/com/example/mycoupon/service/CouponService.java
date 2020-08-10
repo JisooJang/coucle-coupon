@@ -2,11 +2,9 @@ package com.example.mycoupon.service;
 
 import com.example.mycoupon.aop.LogExecutionTime;
 import com.example.mycoupon.domain.Coupon;
-import com.example.mycoupon.exceptions.InvalidPayloadException;
+import com.example.mycoupon.enums.DiscountType;
 import com.example.mycoupon.repository.CouponRepository;
 import com.example.mycoupon.utils.CouponUtils;
-import com.example.mycoupon.utils.ValidationRegex;
-import com.example.mycoupon.domain.CouponInfo;
 import com.example.mycoupon.domain.Member;
 import com.example.mycoupon.exceptions.CouponMemberNotMatchException;
 import com.example.mycoupon.exceptions.CouponNotFoundException;
@@ -24,7 +22,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
-import java.util.regex.Pattern;
 
 @Slf4j
 @Service
@@ -49,17 +46,22 @@ public class CouponService {
     public CompletableFuture<Coupon> save() {
         return CompletableFuture.supplyAsync(() -> {
             LocalDateTime nowDateLocal = LocalDateTime.now();
+            Integer discountRate = CouponUtils.getRandomDiscountRate();
             Coupon coupon = Coupon.builder()
                     .code(CouponUtils.getUUIDCouponCode())
+                    .isUsed(false)
+                    .discountType(DiscountType.PERCENTAGE)
+                    .discount(discountRate)
+                    .constraints(discountRate * 1000)
                     .build();
 
             Coupon couponResult = couponRepository.save(coupon);
-            CouponInfo couponInfo = CouponInfo.builder()
-                    .couponId(couponResult.getId())
-                    .isUsed(false)
-                    .build();
-
-            couponInfoRepository.save(couponInfo);
+//            CouponInfo couponInfo = CouponInfo.builder()
+//                    .couponId(couponResult.getId())
+//                    .isUsed(false)
+//                    .build();
+//
+//            couponInfoRepository.save(couponInfo);
             return couponResult;
         });
     }
@@ -97,7 +99,7 @@ public class CouponService {
         if(coupon.getMember().getId() != memberId) {
             throw new CouponMemberNotMatchException(code);
         }
-        coupon.getCouponInfo().setIsUsed(isUsed);
+        coupon.setIsUsed(isUsed);
     }
 
     @Transactional(readOnly = true)
