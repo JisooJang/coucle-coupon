@@ -68,14 +68,14 @@ public class Coupon implements Serializable {
     private Boolean isUsed;
 
     @Column(name = "discount", nullable = false)
-    private Short discount;
+    private Integer discount;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "discount_type", nullable = false)
     private DiscountType discountType; // enum
 
     @Column(name = "constraints", nullable = false)
-    private Short constraints; // 쿠폰 사용 제약 조건 (최소 이용 금액)
+    private Integer constraints; // 쿠폰 사용 제약 조건 (최소 이용 금액)
 
     // 낙관적 락 사용(여러 트랜잭션에서 유저에게 할당할 때 대비 => 최초 커밋만 인정정)
     @Version
