@@ -19,7 +19,7 @@ public interface CouponRepository extends JpaRepository<Coupon, Long> {
 
     List<Coupon> findByMemberId(Long memberId);
 
-    @Query(value = "SELECT c from Coupon c WHERE c.member.id = :member_id AND c.isUsed = false")
+    @Query(value = "SELECT c from Coupon c WHERE c.member.id = :member_id")
     List<Coupon> findByMemberNotUsed(@Param("member_id") Long memberId);
 
     // JPQL fetch join (Member entity LAZY Loading)
