@@ -8,11 +8,11 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-@ControllerAdvice(annotations = RestController.class)
+// 속성으로 특정 컨트롤러 패키지 경로 설정 가능
+@RestControllerAdvice
 public class CustomControllerAdvice {
     private final MediaType vndErrorMediaType =
             MediaType.parseMediaType("application/vnd.error");

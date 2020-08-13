@@ -19,8 +19,12 @@ public interface CouponRepository extends JpaRepository<Coupon, Long> {
 
     List<Coupon> findByMemberId(Long memberId);
 
-    @Query(value = "SELECT * from coupon JOIN coupon_info ON coupon.id = coupon_info.coupon_id WHERE coupon.member_id = :member_id AND coupon_info.is_used = false", nativeQuery = true)
+    @Query(value = "SELECT c from Coupon c WHERE c.member.id = :member_id")
     List<Coupon> findByMemberNotUsed(@Param("member_id") Long memberId);
+
+    // JPQL fetch join (Member entity LAZY Loading)
+//    @Query(value = "SELECT c from Coupon c join fetch m.member where c.isUsed = false")
+//    List<Coupon> findByMemberNotUsed(@Param("member_id") Long memberId);
 
     @Query(value = "SELECT * from coupon WHERE FORMATDATETIME(EXPIRED_AT, 'yyyy-MM-dd') = DATEADD(DAY, 3, CURRENT_DATE())", nativeQuery = true)
     List<Coupon> findByExpiredAfter3Days();
