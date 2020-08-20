@@ -16,7 +16,6 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
@@ -42,7 +41,6 @@ public class CouponService {
     @Transactional
     public CompletableFuture<Coupon> save() {
         return CompletableFuture.supplyAsync(() -> {
-            LocalDateTime nowDateLocal = LocalDateTime.now();
             Integer discountRate = CouponUtils.getRandomDiscountRate();
             Coupon coupon = Coupon.builder()
                     .code(CouponUtils.getUUIDCouponCode())

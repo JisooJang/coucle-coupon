@@ -198,6 +198,7 @@ endpoint로 직접 요청하는 테스트를 추가하였다.
 (사용 출처 : https://dbdiagram.io/)
 * Coupon entity에 낙관적 락 해결을 위한 version 컬럼 추가. 
 * (데이터 업데이트 시 version값이 1씩 증가하여 트랜잭션 커밋 전에 version 값이 바뀌었는지 체크하는 방식으로 동시성 해결)
+
 ## How to Build
 ```
 gradlew build
