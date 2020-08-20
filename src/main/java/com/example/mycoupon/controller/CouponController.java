@@ -3,6 +3,7 @@ package com.example.mycoupon.controller;
 import com.example.mycoupon.domain.Coupon;
 import com.example.mycoupon.domain.Member;
 import com.example.mycoupon.exceptions.CouponNotFoundException;
+import com.example.mycoupon.exceptions.InternalFailureException;
 import com.example.mycoupon.exceptions.InvalidPayloadException;
 import com.example.mycoupon.service.CouponService;
 import com.example.mycoupon.service.MemberService;
@@ -22,8 +23,6 @@ import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-import static java.util.concurrent.CompletableFuture.completedFuture;
-
 /*
 JwyAuthorizationFilter 로직을 컨트롤러 진입 전에 먼저 타서 헤더의 토큰이 유효한 지 검사 후 ->
 토큰이 유효하면, memberId를 Request attribute에 담아 컨트롤러로 전달한다.
@@ -42,7 +41,7 @@ public class CouponController {
     }
 
     @PostMapping("/{num}")
-    public CompletableFuture<ResponseEntity<?>> saveCoupon(@PathVariable("num") int num, @RequestAttribute Long memberId) throws InterruptedException {
+    public CompletableFuture<ResponseEntity<?>> saveCoupon(@PathVariable("num") int num, @RequestAttribute Long memberId) {
         if(num > 100000) {
             throw new InvalidPayloadException("The number of coupon should be less than 1000000.");
         }
@@ -61,12 +60,15 @@ public class CouponController {
     public CompletableFuture<ResponseEntity<String>> assignToUserCouponAsync(@RequestAttribute("memberId") Long memberId) throws MemberNotFoundException, ExecutionException, InterruptedException { // user_id는 JwtAuthorizationFilter에서 넘겨줌.
         Optional<Member> member = memberService.findById(memberId);
         if(member.isPresent()) {
-            CompletableFuture<String> futureResult =
-                    couponservice.assignToUserAsync(member.get());
-            return completedFuture(ResponseEntity.ok().body(futureResult.get()));
+            return couponservice.assignToUserAsync(member.get())
+                    .thenApply((s) -> ResponseEntity.ok().body(s))
+                    .exceptionally((e) -> {
+                        throw new InternalFailureException(e);
+                    });
         } else {
             throw new MemberNotFoundException(memberId);
         }
+
     }
 
     @GetMapping("/user")
