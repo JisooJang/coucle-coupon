@@ -1,9 +1,6 @@
 package com.example.mycoupon.config;
 
-import com.example.mycoupon.exceptions.CouponMemberNotMatchException;
-import com.example.mycoupon.exceptions.CouponNotFoundException;
-import com.example.mycoupon.exceptions.InvalidPayloadException;
-import com.example.mycoupon.exceptions.MemberNotFoundException;
+import com.example.mycoupon.exceptions.*;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -30,6 +27,11 @@ public class CustomControllerAdvice {
     @ExceptionHandler(InvalidPayloadException.class)
     ResponseEntity<Object> invalidPayloadException(InvalidPayloadException e) {
         return this.error(e, HttpStatus.BAD_REQUEST, e.getLocalizedMessage());
+    }
+
+    @ExceptionHandler(InternalFailureException.class)
+    ResponseEntity<Object> internalFailureException(InternalFailureException e) {
+        return this.error(e, HttpStatus.INTERNAL_SERVER_ERROR, e.getLocalizedMessage());
     }
 
     private <E extends Exception> ResponseEntity<Object> error(E error, HttpStatus httpStatus, String msg) {
