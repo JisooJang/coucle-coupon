@@ -99,13 +99,13 @@ public class CouponService {
     }
 
     @Transactional(readOnly = true)
-    public List<Coupon> findExpiredToday() {
+    public Optional<List<Coupon>> findExpiredToday() {
         return couponRepository.findByExpiredToday();
     }
 
     @Cacheable(value="coupon-list", key="#memberId")
     @Transactional(readOnly = true)
-    public List<Coupon> findByMember(long memberId) {
+    public Optional<List<Coupon>> findByMember(long memberId) {
         log.info("@Cacheable findByMember method called.");
         return couponRepository.findByMemberNotUsed(memberId);
     }
