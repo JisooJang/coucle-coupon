@@ -57,7 +57,7 @@ public class Coupon implements Serializable {
 
     @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY) // default : 즉시 로딩
-    @JoinColumn(name = "member_id") 
+    @JoinColumn(name = "member_id")  // 외래키를 가진쪽이 연관관계 주인. (Coupon 테이블에서 member_id 외래키 관리)
     private Member member; // FK
 
 //    @OneToOne
