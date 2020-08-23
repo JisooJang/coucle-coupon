@@ -40,28 +40,28 @@ public class CouponControllerTest {
     @InjectMocks
     private CouponController couponController;
 
-    private Executor executor;
+    //private Executor executor;
 
 
     @Before
     public void prepare() {
         MockHttpServletRequest request = new MockHttpServletRequest();
         RequestContextHolder.setRequestAttributes(new ServletRequestAttributes(request));
-        executor = Executors.newFixedThreadPool(10);
+        //executor = Executors.newFixedThreadPool(10);
     }
 
-    public void doAsync(CompletableFuture<?> future) {
-        this.executor.execute(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    future.get();
-                } catch (InterruptedException | ExecutionException e) {
-                    e.printStackTrace();
-                }
-            }
-        });
-    }
+//    public void doAsync(CompletableFuture<?> future) {
+//        this.executor.execute(new Runnable() {
+//            @Override
+//            public void run() {
+//                try {
+//                    future.get();
+//                } catch (InterruptedException | ExecutionException e) {
+//                    e.printStackTrace();
+//                }
+//            }
+//        });
+//    }
 
     @Test
     public void saveCoupon() throws Exception {
