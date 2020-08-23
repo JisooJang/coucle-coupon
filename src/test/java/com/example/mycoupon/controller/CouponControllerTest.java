@@ -88,8 +88,7 @@ public class CouponControllerTest {
         given(this.memberService.findById(memberId)).willReturn(java.util.Optional.ofNullable(fakeMember));
 
         Coupon fakeCoupon = Coupon.builder().code(UUID.randomUUID().toString()).member(fakeMember).build();
-        given(this.couponService.assignToUserAsync(fakeMember)).willReturn(new CompletableFuture<String>());
-        given(this.couponService.assignToUserAsync(fakeMember).get()).willReturn(fakeCoupon.getCode());
+        given(this.couponService.assignToUserAsync(fakeMember)).willReturn(new CompletableFuture<String>().completedFuture(fakeCoupon.getCode()));
         CompletableFuture<ResponseEntity<String>> result = couponController.assignToUserCouponAsync(memberId);
 
         assertThat(result.get().getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -122,7 +121,7 @@ public class CouponControllerTest {
     @Test
     public void getUserCouponsNone() throws Exception {
         long memberId = 1L;
-        given(couponService.findByMember(memberId)).willReturn(null);
+        given(couponService.findByMember(memberId)).willReturn(Optional.empty());
 
         ResponseEntity<?> result = couponController.getUserCoupons(memberId);
         assertThat(result.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
@@ -162,6 +161,7 @@ public class CouponControllerTest {
     @Test
     public void getExpiredCouponNone() throws Exception {
         ResponseEntity<?> result = couponController.getExpiredCoupon();
+        given(this.couponService.findExpiredToday()).willReturn(Optional.empty());
         assertThat(result.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
     }
 
