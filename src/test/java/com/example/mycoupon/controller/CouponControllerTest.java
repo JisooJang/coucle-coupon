@@ -132,7 +132,7 @@ public class CouponControllerTest {
         String fakeCouponCode = UUID.randomUUID().toString();
         long memberId = 1L;
 
-        CompletableFuture<ResponseEntity<?>> result = couponController.updateWhetherUsingCoupon(fakeCouponCode, true, memberId);
+        CompletableFuture<ResponseEntity<Object>> result = couponController.updateWhetherUsingCoupon(fakeCouponCode, true, memberId);
         assertThat(result.get().getStatusCode()).isEqualTo(HttpStatus.OK);
     }
 
@@ -141,7 +141,7 @@ public class CouponControllerTest {
         String fakeCouponCode = UUID.randomUUID().toString();
         long memberId = 1L;
 
-        CompletableFuture<ResponseEntity<?>> result = couponController.updateWhetherUsingCoupon(fakeCouponCode, false, memberId);
+        CompletableFuture<ResponseEntity<Object>> result = couponController.updateWhetherUsingCoupon(fakeCouponCode, false, memberId);
         assertThat(result.get().getStatusCode()).isEqualTo(HttpStatus.OK);
     }
 
