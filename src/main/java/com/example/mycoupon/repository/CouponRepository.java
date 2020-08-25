@@ -15,7 +15,7 @@ public interface CouponRepository extends JpaRepository<Coupon, Long> {
     @Query(value = "SELECT * from coupon WHERE FORMATDATETIME(EXPIRED_AT, 'yyyy-MM-dd') = CURRENT_DATE()", nativeQuery = true)
     Optional<List<Coupon>> findByExpiredToday();
 
-    Coupon findByCode(String code);
+    Optional<Coupon> findByCode(String code);
 
     List<Coupon> findByMemberId(Long memberId);
 
