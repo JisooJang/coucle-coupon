@@ -3,11 +3,13 @@ package com.example.mycoupon.service;
 import com.example.mycoupon.domain.Coupon;
 import com.example.mycoupon.domain.Member;
 import com.example.mycoupon.repository.CouponRepository;
+import com.example.mycoupon.template.AlarmTalk;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
+import org.springframework.kafka.core.KafkaTemplate;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -21,11 +23,14 @@ public class CouponSchedulerServiceTest {
     @Mock
     private CouponRepository couponRepository;
 
+    @Mock
+    private KafkaTemplate<String, AlarmTalk> kafkaTemplate;
+
     private CouponSchedulerService schedulerService;
 
     @Before
     public void prepare() {
-        this.schedulerService = new CouponSchedulerService(couponRepository, new NotiService());
+        this.schedulerService = new CouponSchedulerService(couponRepository, new NotiService(kafkaTemplate));
     }
     @Test
     public void sendNoticeExpiredAfter3days() {

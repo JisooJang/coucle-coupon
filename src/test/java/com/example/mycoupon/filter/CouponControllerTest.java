@@ -5,13 +5,13 @@ import com.auth0.jwt.algorithms.Algorithm;
 import com.example.mycoupon.config.security.JWTSecurityConstants;
 import com.example.mycoupon.controller.CouponController;
 import com.example.mycoupon.domain.Coupon;
-import com.example.mycoupon.exceptions.InvalidPayloadException;
 import com.example.mycoupon.repository.CouponRepository;
 import com.example.mycoupon.service.CouponService;
 import com.example.mycoupon.domain.Member;
 import com.example.mycoupon.service.MemberService;
 import com.example.mycoupon.exceptions.CouponMemberNotMatchException;
 import com.example.mycoupon.exceptions.CouponNotFoundException;
+import com.example.mycoupon.utils.CouponUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -25,6 +25,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
@@ -83,6 +84,10 @@ public class CouponControllerTest {
 
     @Test
     public void CouponCreateSuccess() throws Exception {
+        Coupon fakeCoupon = Coupon.builder()
+                .code(CouponUtils.getUUIDCouponCode())
+                .build();
+        given(this.couponService.save()).willReturn(new CompletableFuture<>().completedFuture(fakeCoupon));
         mvc.perform(MockMvcRequestBuilders
                 .post("/coupon/100")
                 .header("Authorization", "Bearer " + getJWT())
@@ -93,7 +98,7 @@ public class CouponControllerTest {
     @Test
     public void CouponCreateFailureByOverLimit() throws Exception {
         mvc.perform(MockMvcRequestBuilders
-                .post("/coupon/5000")
+                .post("/coupon/200000")
                 .header("Authorization", "Bearer " + getJWT())
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
@@ -120,7 +125,7 @@ public class CouponControllerTest {
     @Test
     public void CouponGetUserSuccess() throws Exception {
         Coupon coupon = Coupon.builder().code(UUID.randomUUID().toString()).build();
-        given(couponService.findByMember(any(Long.class))).willReturn(Collections.singletonList(coupon));
+        given(couponService.findByMember(any(Long.class))).willReturn(Optional.of(Collections.singletonList(coupon)));
         mvc.perform(MockMvcRequestBuilders
                 .get("/coupon/user")
                 .header("Authorization", "Bearer " + getJWT())
@@ -130,7 +135,7 @@ public class CouponControllerTest {
 
     @Test
     public void CouponGetUserSuccessNoContent() throws Exception {
-        given(couponService.findByMember(any(Long.class))).willReturn(null);
+        given(couponService.findByMember(any(Long.class))).willReturn(Optional.empty());
         mvc.perform(MockMvcRequestBuilders
                 .get("/coupon/user")
                 .header("Authorization", "Bearer " + getJWT())
@@ -162,7 +167,7 @@ public class CouponControllerTest {
         Coupon coupon = Coupon.builder().code(UUID.randomUUID().toString()).build();
 
         given(memberService.findById(any(Long.class))).willReturn(Optional.ofNullable(fakeMember));
-        given(couponService.assignToUser(fakeMember)).willReturn(coupon.getCode());
+        given(couponService.assignToUserAsync(fakeMember)).willReturn(new CompletableFuture<>().completedFuture(coupon.getCode()));
 
         mvc.perform(MockMvcRequestBuilders
                 .put("/coupon/user")
@@ -203,11 +208,12 @@ public class CouponControllerTest {
     public void CouponPutUseSuccess() throws Exception {
         String fakeCode = UUID.randomUUID().toString();
         Member fakeMember = Member.builder().mediaId("test").password("test1234").build();
+        fakeMember.setId(1L);
         Coupon coupon = Coupon.builder().code(fakeCode).member(fakeMember).build();
 
-        given(couponRepository.findByCode(fakeCode)).willReturn(coupon);
+        given(couponService.findByCode(fakeCode)).willReturn(Optional.of(coupon));
         mvc.perform(MockMvcRequestBuilders
-                .put("/coupon/" + fakeCode)
+                .put("/coupon/" + fakeCode + "?is_used=true")
                 .header("Authorization", "Bearer " + getJWT())
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
@@ -216,35 +222,42 @@ public class CouponControllerTest {
     @Test
     public void CouponPutUseFailureInvalidCode() throws Exception {
         String fakeCode = "fakeCouponCode";
-
-        doThrow(new InvalidPayloadException("Invalid format of coupon code."))
-                .when(couponService).validateCouponCode(fakeCode);
         mvc.perform(MockMvcRequestBuilders
-                .put("/coupon/" + fakeCode)
+                .put("/coupon/" + fakeCode + "?is_used=true")
                 .header("Authorization", "Bearer " + getJWT())
                 .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isBadRequest())
+                .andExpect(content().string("Invalid format of coupon code."));
     }
 
     @Test
     public void CouponPutUseFailureCouponNotFound() throws Exception {
         String fakeCode = UUID.randomUUID().toString();
-        doThrow(new CouponNotFoundException(fakeCode))
-                .when(couponService).updateIsEnabledCouponById(fakeCode, 1L, true);
+        given(couponService.findByCode(fakeCode)).willReturn(Optional.empty());
+
         mvc.perform(MockMvcRequestBuilders
-                .put("/coupon/" + fakeCode)
+                .put("/coupon/" + fakeCode + "?is_used=true")
                 .header("Authorization", "Bearer " + getJWT())
                 .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isNotFound());
+                .andExpect(status().isNotFound())
+                .andExpect(content().string("Coupon not found : " + fakeCode));
     }
 
     @Test
     public void CouponPutUseFailureCouponUserNotMatch() throws Exception {
         String fakeCode = UUID.randomUUID().toString();
-        doThrow(new CouponMemberNotMatchException(fakeCode))
-                .when(couponService).updateIsEnabledCouponById(fakeCode, 1L, true);
+        Member fakeMember = new Member();
+        fakeMember.setId(2L);
+
+        Coupon fakeCoupon = Coupon.builder()
+                .code(fakeCode)
+                .member(fakeMember)
+                .build();
+
+        given(couponService.findByCode(fakeCode)).willReturn(Optional.of(fakeCoupon));
+
         mvc.perform(MockMvcRequestBuilders
-                .put("/coupon/" + fakeCode)
+                .put("/coupon/" + fakeCode + "?is_used=true")
                 .header("Authorization", "Bearer " + getJWT())
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isForbidden())
@@ -255,7 +268,7 @@ public class CouponControllerTest {
     public void CouponPutUseFailureInvalidToken() throws Exception {
         String fakeCode = UUID.randomUUID().toString();
         mvc.perform(MockMvcRequestBuilders
-                .put("/coupon/" + fakeCode)
+                .put("/coupon/" + fakeCode + "?is_used=true")
                 .header("Authorization", "Bearer " + "fakeInvalidToken")
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isForbidden());
@@ -266,7 +279,7 @@ public class CouponControllerTest {
     public void CouponPutUseFailureExpiredToken() throws Exception {
         String fakeCode = UUID.randomUUID().toString();
         mvc.perform(MockMvcRequestBuilders
-                .put("/coupon/" + fakeCode)
+                .put("/coupon/" + fakeCode + "?is_used=true")
                 .header("Authorization", "Bearer " + getExpiredJWT())
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isForbidden());
@@ -276,7 +289,7 @@ public class CouponControllerTest {
     public void CouponGetExpiredTodaySuccess() throws Exception {
         Coupon coupon = Coupon.builder().code(UUID.randomUUID().toString()).build();
         List<Coupon> result = Collections.singletonList(coupon);
-        given(couponService.findExpiredToday()).willReturn(result);
+        given(couponService.findExpiredToday()).willReturn(Optional.of(result));
         mvc.perform(MockMvcRequestBuilders
                 .get("/coupon/expired")
                 .header("Authorization", "Bearer " + getJWT())
@@ -287,7 +300,7 @@ public class CouponControllerTest {
 
     @Test
     public void CouponGetExpiredTodaySuccessNoContent() throws Exception {
-        given(couponService.findExpiredToday()).willReturn(null);
+        given(couponService.findExpiredToday()).willReturn(Optional.empty());
         mvc.perform(MockMvcRequestBuilders
                 .get("/coupon/expired")
                 .header("Authorization", "Bearer " + getJWT())

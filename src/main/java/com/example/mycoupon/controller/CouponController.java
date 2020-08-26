@@ -2,26 +2,24 @@ package com.example.mycoupon.controller;
 
 import com.example.mycoupon.domain.Coupon;
 import com.example.mycoupon.domain.Member;
-import com.example.mycoupon.exceptions.CouponNotFoundException;
-import com.example.mycoupon.exceptions.InternalFailureException;
-import com.example.mycoupon.exceptions.InvalidPayloadException;
+import com.example.mycoupon.exceptions.*;
 import com.example.mycoupon.service.CouponService;
 import com.example.mycoupon.service.MemberService;
-import com.example.mycoupon.exceptions.MemberNotFoundException;
 import com.example.mycoupon.utils.CouponUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import java.net.URI;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 
 /*
 JwyAuthorizationFilter 로직을 컨트롤러 진입 전에 먼저 타서 헤더의 토큰이 유효한 지 검사 후 ->
@@ -52,7 +50,7 @@ public class CouponController {
 
         return CompletableFuture.allOf(futureList.toArray(new CompletableFuture[num]))
                 .thenApply((s) -> ResponseEntity.created(
-                        URI.create(ServletUriComponentsBuilder.fromCurrentRequest().toUriString())
+                        linkTo(CouponController.class).toUri()
                 ).build());
     }
 
@@ -80,15 +78,30 @@ public class CouponController {
 
     // TODO : 제한 금액 체크. 파라미터로 주문 금액 체크 필요.
     @PutMapping("/{coupon_code}")
-    public CompletableFuture<ResponseEntity<?>> updateWhetherUsingCoupon(@PathVariable("coupon_code") String couponCode,
-                                       @RequestParam("is_used") Boolean isUsed,
-                                       @RequestAttribute("memberId") Long memberId) throws CouponNotFoundException {
+    public CompletableFuture<ResponseEntity<Object>> updateWhetherUsingCoupon(@PathVariable("coupon_code") String couponCode,
+                                                                              @RequestParam("is_used") Boolean isUsed,
+                                                                              @RequestAttribute("memberId") Long memberId) throws CouponNotFoundException, CouponMemberNotMatchException {
 
         log.info("updateIsEnabledCouponById controller current Thread name : " + Thread.currentThread().getName());
         CouponUtils.validateCouponCode(couponCode);
+
+        Optional<Coupon> coupon = couponservice.findByCode(couponCode);
+        if(coupon.isPresent()) {
+            if(!coupon.get().getMember().getId().equals(memberId)) {
+                throw new CouponMemberNotMatchException(couponCode);
+            }
+        } else {
+            throw new CouponNotFoundException(couponCode);
+        }
+
         return CompletableFuture.runAsync(() ->
-                couponservice.updateIsEnabledCouponById(couponCode, memberId, isUsed)
-        ).thenApply((s) -> ResponseEntity.ok().build());
+                couponservice.updateIsEnabledCouponById(coupon.get(), isUsed)
+        )
+                .thenApply((s) -> ResponseEntity.ok().build())
+                .exceptionally((e) -> {
+                    log.error(e.getLocalizedMessage());
+                    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("future error");
+                });
     }
 
     @GetMapping("/expired")

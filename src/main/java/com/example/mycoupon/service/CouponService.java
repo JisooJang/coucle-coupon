@@ -82,17 +82,23 @@ public class CouponService {
         });
     }
 
+//    @CacheEvict(value="coupon-list", key="#memberId")
+//    @Transactional
+//    public void updateIsEnabledCouponById(String code, long memberId, boolean isUsed) throws CouponNotFoundException {
+//        log.info("updateIsEnabledCouponById service current Thread name : " + Thread.currentThread().getName());
+//        Coupon coupon = couponRepository.findByCode(code);
+//        if(coupon == null) {
+//            throw new CouponNotFoundException(code);
+//        }
+//        if(coupon.getMember().getId() != memberId) {
+//            throw new CouponMemberNotMatchException(code);
+//        }
+//        coupon.setIsUsed(isUsed);
+//    }
+
     @CacheEvict(value="coupon-list", key="#memberId")
     @Transactional
-    public void updateIsEnabledCouponById(String code, long memberId, boolean isUsed) throws CouponNotFoundException {
-        log.info("updateIsEnabledCouponById service current Thread name : " + Thread.currentThread().getName());
-        Coupon coupon = couponRepository.findByCode(code);
-        if(coupon == null) {
-            throw new CouponNotFoundException(code);
-        }
-        if(coupon.getMember().getId() != memberId) {
-            throw new CouponMemberNotMatchException(code);
-        }
+    public void updateIsEnabledCouponById(Coupon coupon, boolean isUsed) throws CouponNotFoundException {
         coupon.setIsUsed(isUsed);
     }
 
@@ -106,5 +112,10 @@ public class CouponService {
     public Optional<List<Coupon>> findByMember(long memberId) {
         log.info("@Cacheable findByMember method called.");
         return couponRepository.findByMemberNotUsed(memberId);
+    }
+
+    @Transactional(readOnly = true)
+    public Optional<Coupon> findByCode(String couponCode) {
+        return couponRepository.findByCode(couponCode);
     }
 }

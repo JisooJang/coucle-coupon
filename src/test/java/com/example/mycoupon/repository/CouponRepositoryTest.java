@@ -15,10 +15,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import javax.validation.ConstraintViolationException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -46,11 +43,12 @@ public class CouponRepositoryTest {
                 .build();
         couponInfo = this.entityManager.persist(couponInfo);
 
-        Coupon freeCoupon = couponRepository.findByFreeUser();
-        assertThat(freeCoupon).isNotNull();
-        assertThat(freeCoupon.getMember()).isNull();
-        assertThat(freeCoupon.getAssignedAt()).isNull();
-        assertThat(freeCoupon.getExpiredAt()).isNull();
+        Optional<Coupon> freeCoupon = couponRepository.findByFreeUser();
+        assertThat(freeCoupon.isPresent()).isNotNull();
+        assertThat(freeCoupon.get()).isEqualTo(coupon);
+        assertThat(freeCoupon.get().getMember()).isNull();
+        assertThat(freeCoupon.get().getAssignedAt()).isNull();
+        assertThat(freeCoupon.get().getExpiredAt()).isNull();
     }
 
     @Test
@@ -61,9 +59,9 @@ public class CouponRepositoryTest {
                 .build();
         coupon = this.entityManager.persist(coupon);
 
-        Coupon result = couponRepository.findByCode(code);
-        assertThat(result).isNotNull();
-        assertThat(result.getCode()).isEqualTo(code);
+        Optional<Coupon> result = couponRepository.findByCode(code);
+        assertThat(result.isPresent()).isEqualTo(true);
+        assertThat(result.get().getCode()).isEqualTo(code);
     }
 
     @Test
@@ -103,8 +101,9 @@ public class CouponRepositoryTest {
                 .build();
         coupon = this.entityManager.persist(coupon);
 
-        List<Coupon> results = couponRepository.findByExpiredToday();
-        assertThat(results).size().isEqualTo(1);
+        Optional<List<Coupon>> results = couponRepository.findByExpiredToday();
+        assertThat(results.isPresent()).isEqualTo(true);
+        assertThat(results.get()).size().isEqualTo(1);
     }
 
     @Test
