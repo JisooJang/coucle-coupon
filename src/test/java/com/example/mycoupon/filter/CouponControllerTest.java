@@ -9,30 +9,33 @@ import com.example.mycoupon.repository.CouponRepository;
 import com.example.mycoupon.service.CouponService;
 import com.example.mycoupon.domain.Member;
 import com.example.mycoupon.service.MemberService;
-import com.example.mycoupon.exceptions.CouponMemberNotMatchException;
-import com.example.mycoupon.exceptions.CouponNotFoundException;
 import com.example.mycoupon.utils.CouponUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.OverrideAutoConfiguration;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.doThrow;
+import static org.springframework.http.MediaType.APPLICATION_JSON;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+// REFERENCE : https://sadique.io/blog/2015/11/24/testing-async-responses-using-mockmvc/
 @RunWith(SpringRunner.class)
 @WebMvcTest(value = CouponController.class)
 @OverrideAutoConfiguration(enabled=true)
@@ -88,37 +91,38 @@ public class CouponControllerTest {
                 .code(CouponUtils.getUUIDCouponCode())
                 .build();
         given(this.couponService.save()).willReturn(new CompletableFuture<>().completedFuture(fakeCoupon));
-        mvc.perform(MockMvcRequestBuilders
-                .post("/coupon/100")
+
+        MvcResult result = mvc.perform(post("/test/deferred")
                 .header("Authorization", "Bearer " + getJWT())
-                .contentType(MediaType.APPLICATION_JSON))
+                .contentType(APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.request().asyncStarted())
+                .andReturn();
+
+        mvc.perform(asyncDispatch(result))
                 .andExpect(status().isCreated());
     }
 
     @Test
     public void CouponCreateFailureByOverLimit() throws Exception {
-        mvc.perform(MockMvcRequestBuilders
-                .post("/coupon/200000")
+        mvc.perform(post("/coupon/200000")
                 .header("Authorization", "Bearer " + getJWT())
-                .contentType(MediaType.APPLICATION_JSON))
+                .contentType(APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
     }
 
     @Test
     public void CouponCreateFailureByExpiredToken() throws Exception {
-        mvc.perform(MockMvcRequestBuilders
-                .post("/coupon/100")
+        mvc.perform(post("/coupon/100")
                 .header("Authorization", "Bearer " + getExpiredJWT())
-                .contentType(MediaType.APPLICATION_JSON))
+                .contentType(APPLICATION_JSON))
                 .andExpect(status().isForbidden());
     }
 
     @Test
     public void CouponCreateFailureByInvalidToken() throws Exception {
-        mvc.perform(MockMvcRequestBuilders
-                .post("/coupon/100")
+        mvc.perform(post("/coupon/100")
                 .header("Authorization", "Bearer " + "fakeInvalidToken")
-                .contentType(MediaType.APPLICATION_JSON))
+                .contentType(APPLICATION_JSON))
                 .andExpect(status().isForbidden());
     }
 
@@ -126,38 +130,34 @@ public class CouponControllerTest {
     public void CouponGetUserSuccess() throws Exception {
         Coupon coupon = Coupon.builder().code(UUID.randomUUID().toString()).build();
         given(couponService.findByMember(any(Long.class))).willReturn(Optional.of(Collections.singletonList(coupon)));
-        mvc.perform(MockMvcRequestBuilders
-                .get("/coupon/user")
+        mvc.perform(get("/coupon/user")
                 .header("Authorization", "Bearer " + getJWT())
-                .contentType(MediaType.APPLICATION_JSON))
+                .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk());
     }
 
     @Test
     public void CouponGetUserSuccessNoContent() throws Exception {
         given(couponService.findByMember(any(Long.class))).willReturn(Optional.empty());
-        mvc.perform(MockMvcRequestBuilders
-                .get("/coupon/user")
+        mvc.perform(get("/coupon/user")
                 .header("Authorization", "Bearer " + getJWT())
-                .contentType(MediaType.APPLICATION_JSON))
+                .contentType(APPLICATION_JSON))
                 .andExpect(status().isNoContent());
     }
 
     @Test
     public void CouponGetUserFailureByExpiredToken() throws Exception {
-        mvc.perform(MockMvcRequestBuilders
-                .get("/coupon/user")
+        mvc.perform(get("/coupon/user")
                 .header("Authorization", "Bearer " + getExpiredJWT())
-                .contentType(MediaType.APPLICATION_JSON))
+                .contentType(APPLICATION_JSON))
                 .andExpect(status().isForbidden());
     }
 
     @Test
     public void CouponGetUserFailureByInvalidToken() throws Exception {
-        mvc.perform(MockMvcRequestBuilders
-                .get("/coupon/user")
+        mvc.perform(get("/coupon/user")
                 .header("Authorization", "Bearer " + "fakeInvalidToken")
-                .contentType(MediaType.APPLICATION_JSON))
+                .contentType(APPLICATION_JSON))
                 .andExpect(status().isForbidden());
     }
 
@@ -172,7 +172,7 @@ public class CouponControllerTest {
         mvc.perform(MockMvcRequestBuilders
                 .put("/coupon/user")
                 .header("Authorization", "Bearer " + getJWT())
-                .contentType(MediaType.APPLICATION_JSON))
+                .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk());
     }
 
@@ -182,7 +182,7 @@ public class CouponControllerTest {
         mvc.perform(MockMvcRequestBuilders
                 .put("/coupon/user")
                 .header("Authorization", "Bearer " + getJWT())
-                .contentType(MediaType.APPLICATION_JSON))
+                .contentType(APPLICATION_JSON))
                 .andExpect(status().isNotFound());
     }
 
@@ -191,7 +191,7 @@ public class CouponControllerTest {
         mvc.perform(MockMvcRequestBuilders
                 .put("/coupon/user")
                 .header("Authorization", "Bearer " + getExpiredJWT())
-                .contentType(MediaType.APPLICATION_JSON))
+                .contentType(APPLICATION_JSON))
                 .andExpect(status().isForbidden());
     }
 
@@ -200,7 +200,7 @@ public class CouponControllerTest {
         mvc.perform(MockMvcRequestBuilders
                 .put("/coupon/user")
                 .header("Authorization", "Bearer " + "fakeInvalidToken")
-                .contentType(MediaType.APPLICATION_JSON))
+                .contentType(APPLICATION_JSON))
                 .andExpect(status().isForbidden());
     }
 
@@ -215,7 +215,7 @@ public class CouponControllerTest {
         mvc.perform(MockMvcRequestBuilders
                 .put("/coupon/" + fakeCode + "?is_used=true")
                 .header("Authorization", "Bearer " + getJWT())
-                .contentType(MediaType.APPLICATION_JSON))
+                .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk());
     }
 
@@ -225,7 +225,7 @@ public class CouponControllerTest {
         mvc.perform(MockMvcRequestBuilders
                 .put("/coupon/" + fakeCode + "?is_used=true")
                 .header("Authorization", "Bearer " + getJWT())
-                .contentType(MediaType.APPLICATION_JSON))
+                .contentType(APPLICATION_JSON))
                 .andExpect(status().isBadRequest())
                 .andExpect(content().string("Invalid format of coupon code."));
     }
@@ -238,7 +238,7 @@ public class CouponControllerTest {
         mvc.perform(MockMvcRequestBuilders
                 .put("/coupon/" + fakeCode + "?is_used=true")
                 .header("Authorization", "Bearer " + getJWT())
-                .contentType(MediaType.APPLICATION_JSON))
+                .contentType(APPLICATION_JSON))
                 .andExpect(status().isNotFound())
                 .andExpect(content().string("Coupon not found : " + fakeCode));
     }
@@ -259,7 +259,7 @@ public class CouponControllerTest {
         mvc.perform(MockMvcRequestBuilders
                 .put("/coupon/" + fakeCode + "?is_used=true")
                 .header("Authorization", "Bearer " + getJWT())
-                .contentType(MediaType.APPLICATION_JSON))
+                .contentType(APPLICATION_JSON))
                 .andExpect(status().isForbidden())
                 .andExpect((content().string("This coupon is not matched with request user. : " + fakeCode)));
     }
@@ -270,7 +270,7 @@ public class CouponControllerTest {
         mvc.perform(MockMvcRequestBuilders
                 .put("/coupon/" + fakeCode + "?is_used=true")
                 .header("Authorization", "Bearer " + "fakeInvalidToken")
-                .contentType(MediaType.APPLICATION_JSON))
+                .contentType(APPLICATION_JSON))
                 .andExpect(status().isForbidden());
 
     }
@@ -281,7 +281,7 @@ public class CouponControllerTest {
         mvc.perform(MockMvcRequestBuilders
                 .put("/coupon/" + fakeCode + "?is_used=true")
                 .header("Authorization", "Bearer " + getExpiredJWT())
-                .contentType(MediaType.APPLICATION_JSON))
+                .contentType(APPLICATION_JSON))
                 .andExpect(status().isForbidden());
     }
 
@@ -290,10 +290,9 @@ public class CouponControllerTest {
         Coupon coupon = Coupon.builder().code(UUID.randomUUID().toString()).build();
         List<Coupon> result = Collections.singletonList(coupon);
         given(couponService.findExpiredToday()).willReturn(Optional.of(result));
-        mvc.perform(MockMvcRequestBuilders
-                .get("/coupon/expired")
+        mvc.perform(get("/coupon/expired")
                 .header("Authorization", "Bearer " + getJWT())
-                .contentType(MediaType.APPLICATION_JSON))
+                .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().string(new ObjectMapper().writeValueAsString(result)));
     }
@@ -301,28 +300,25 @@ public class CouponControllerTest {
     @Test
     public void CouponGetExpiredTodaySuccessNoContent() throws Exception {
         given(couponService.findExpiredToday()).willReturn(Optional.empty());
-        mvc.perform(MockMvcRequestBuilders
-                .get("/coupon/expired")
+        mvc.perform(get("/coupon/expired")
                 .header("Authorization", "Bearer " + getJWT())
-                .contentType(MediaType.APPLICATION_JSON))
+                .contentType(APPLICATION_JSON))
                 .andExpect(status().isNoContent());
     }
 
     @Test
     public void CouponGetExpiredTodayFailureExpiredToken() throws Exception {
-        mvc.perform(MockMvcRequestBuilders
-                .get("/coupon/expired")
+        mvc.perform(get("/coupon/expired")
                 .header("Authorization", "Bearer " + getExpiredJWT())
-                .contentType(MediaType.APPLICATION_JSON))
+                .contentType(APPLICATION_JSON))
                 .andExpect(status().isForbidden());
     }
 
     @Test
     public void CouponGetExpiredTodayFailureInvalidToken() throws Exception {
-        mvc.perform(MockMvcRequestBuilders
-                .get("/coupon/expired")
+        mvc.perform(get("/coupon/expired")
                 .header("Authorization", "Bearer " + "fakeInvalidToken")
-                .contentType(MediaType.APPLICATION_JSON))
+                .contentType(APPLICATION_JSON))
                 .andExpect(status().isForbidden());
     }
 
