@@ -4,7 +4,6 @@ import com.example.mycoupon.template.AlarmTalk;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.core.KafkaTemplate;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 @Slf4j
@@ -17,7 +16,6 @@ public class NotiService {
         this.kafkaTemplate = kafkaTemplate;
     }
 
-    @Async
     public void sendAlarmTalkToUser(AlarmTalk alarmTalk) {
         log.info("Your coupon expires in 3 days. userNumber : " + alarmTalk.getPhoneNumber() + " - " + Thread.currentThread().getName());
         kafkaTemplate.send("alarmtalk.notification", alarmTalk);

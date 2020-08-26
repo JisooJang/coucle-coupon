@@ -94,9 +94,7 @@ public class CouponController {
             throw new CouponNotFoundException(couponCode);
         }
 
-        return CompletableFuture.runAsync(() ->
-                couponservice.updateIsEnabledCouponById(coupon.get(), isUsed)
-        )
+        return CompletableFuture.runAsync(() -> couponservice.updateIsEnabledCouponById(coupon.get(), isUsed))
                 .thenApply((s) -> ResponseEntity.ok().build())
                 .exceptionally((e) -> {
                     log.error(e.getLocalizedMessage());
