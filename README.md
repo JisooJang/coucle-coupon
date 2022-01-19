@@ -123,6 +123,35 @@ spring-cloud-starter-openfeign
 - `successfulAuthentication` method에서는 로그인을 성공항 유저기반의 JWT 토큰을 생성하여 응답 헤더에 넘겨준다. <br>
 - `unsuccessfulAuthentication` method에서는 인증 실패 Exception 구분에 따라 적당한 status_code와 에러메시지를 리턴한다. <br>
 
+### JWT creation
+```java
+@Override
+    protected void successfulAuthentication(HttpServletRequest req,
+                                            HttpServletResponse res,
+                                            FilterChain chain,
+                                            Authentication auth) throws IOException, ServletException {
+                                            
+        // setting JWT at response header
+        SecurityMember member = (SecurityMember)auth.getPrincipal();
+
+        long current = System.currentTimeMillis();
+        Date issuedAt = new Date(current);
+        Date expiredAt = new Date(current + JWTSecurityConstants.EXPIRATION_TIME);
+        
+        String token = JWT.create()
+                        .withIssuer("MyCoupon")
+                        .withAudience(Long.toString(member.getId()))
+                        .withSubject(member.getUsername())
+                        .withIssuedAt(issuedAt)
+                        .withExpiresAt(expiredAt)
+                        .sign(Algorithm.HMAC512(JWTSecurityConstants.SECRET.getBytes()));
+
+        res.addHeader(JWTSecurityConstants.HEADER_STRING, JWTSecurityConstants.TOKEN_PREFIX + token);
+        ...
+    }
+```
+
+
 ### JWT authorization 
 <img width="500" alt="JwtAuthorizationFilter" src="https://user-images.githubusercontent.com/26767161/80301701-9aef0080-87e0-11ea-8981-f454127f74ad.PNG">
 
