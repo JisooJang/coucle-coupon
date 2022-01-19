@@ -123,7 +123,7 @@ spring-cloud-starter-openfeign
 - `successfulAuthentication` method에서는 로그인을 성공항 유저기반의 JWT 토큰을 생성하여 응답 헤더에 넘겨준다. <br>
 - `unsuccessfulAuthentication` method에서는 인증 실패 Exception 구분에 따라 적당한 status_code와 에러메시지를 리턴한다. <br>
 
-### JWT creation
+### JWT creation (signIn / signUp)
 ```java
 @Override
     protected void successfulAuthentication(HttpServletRequest req,
